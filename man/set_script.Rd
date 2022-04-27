@@ -15,8 +15,8 @@ results. The results must be a list of key-value pairs. Values are
 categorized as simple (a number, a character string, etc.) or complex
 (vectors, dataframes, lists, etc.). Complex data must go inside a key
 called ".complex" and the associated value must be a list (see examples).
-The function body can contain references to the special objects \code{L}
-(simulation levels) and \code{C} (simulation constants) (see examples).
+The function body can contain references to the special object \code{L}
+that stores the current set of simulation levels (see examples).
 The keys must be valid R names (see ?make.names).}
 }
 \value{
@@ -32,17 +32,16 @@ Specify a function to be used as the "simulation script". The
 # The following is a toy example of a simulation, illustrating the use of
 # the set_script function.
 sim <- new_sim()
-sim \%<>\% add_creator("create_data", function(n) { rpois(n, lambda=5) })
-sim \%<>\% add_method("estimator_1", function(dat) { mean(dat) })
-sim \%<>\% add_method("estimator_2", function(dat) { var(dat) })
-sim \%<>\% set_levels(
-  "n" = c(10, 100, 1000),
-  "estimator" = c("estimator_1", "estimator_2")
-)
+create_data <- function(n) { rpois(n, lambda=5) }
+est_mean <- function(dat, type) {
+  if (type=="M") { return(mean(dat)) }
+  if (type=="V") { return(var(dat)) }
+}
+sim \%<>\% set_levels(n=c(10,100,1000), est=c("M","V"))
 sim \%<>\% set_config(num_sim=1)
 sim \%<>\% set_script(function() {
   dat <- create_data(L$n)
-  lambda_hat <- use_method(L$estimator, list(dat))
+  lambda_hat <- est_mean(dat=dat, type=L$est)
   return (list("lambda_hat"=lambda_hat))
 })
 sim \%<>\% run()

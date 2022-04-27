@@ -10,23 +10,21 @@ library(SimEngine)
 ## -----------------------------------------------------------------------------
 sim <- new_sim()
 
-sim %<>% add_creator("create_rct_data",
-  function(n, mu_0, mu_1, sigma_0, sigma_1) {
-    group <- sample(rep(c(0,1),n))
-    outcome <- (1-group) * rnorm(n=n, mean=mu_0, sd=sigma_0) +
-               group * rnorm(n=n, mean=mu_1, sd=sigma_1)
-    return(data.frame("group"=group, "outcome"=outcome))
-  }
-)
+create_rct_data <- function(n, mu_0, mu_1, sigma_0, sigma_1) {
+  group <- sample(rep(c(0,1),n))
+  outcome <- (1-group) * rnorm(n=n, mean=mu_0, sd=sigma_0) +
+             group * rnorm(n=n, mean=mu_1, sd=sigma_1)
+  return(data.frame("group"=group, "outcome"=outcome))
+}
 
-# Test our creator function
-sim$creators$create_rct_data(n=3, mu_0=3, mu_1=4, sigma_0=0.1, sigma_1=0.1)
+# Test our data-generating function
+create_rct_data(n=3, mu_0=3, mu_1=4, sigma_0=0.1, sigma_1=0.1)
 
 ## -----------------------------------------------------------------------------
-sim %<>% add_method("run_test", function(data) {
+run_test <- function(data) {
   test_result <- t.test(outcome~group, data=data)
   return(as.integer(test_result$p.value<0.05))
-})
+}
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_script(function() {

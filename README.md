@@ -1,14 +1,16 @@
-<!-- badges: start -->
-  ![GitHub R package version](https://img.shields.io/github/r-package/v/Avi-Kenny/SimEngine)
+<!-- badges: start
+  ![GitHub R package version](https://img.shields.io/github/r-package/v/Avi-Kenny/SimEngine) -->
+  [![CRAN status](https://www.r-pkg.org/badges/version/SimEngine)](https://CRAN.R-project.org/package=SimEngine)
   ![GitHub](https://img.shields.io/github/license/Avi-Kenny/SimEngine)
   [![R-CMD-check](https://github.com/Avi-Kenny/SimEngine/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/Avi-Kenny/SimEngine/actions/workflows/R-CMD-check.yml)
-  [![Codecov test coverage](https://codecov.io/gh/Avi-Kenny/SimEngine/branch/master/graph/badge.svg)](https://codecov.io/gh/Avi-Kenny/SimEngine?branch=master)
+  [![Codecov test coverage](https://codecov.io/gh/Avi-Kenny/SimEngine/branch/master/graph/badge.svg)](https://app.codecov.io/gh/Avi-Kenny/SimEngine?branch=master)
+  [![](https://cranlogs.r-pkg.org/badges/SimEngine)](https://CRAN.R-project.org/package=SimEngine)
 <!-- badges: end -->
 
 
 # SimEngine <img src='man/figures/logo.png' align="right" height="150" />
 
-An open-source framework for statistical simulations in R
+A modular framework for statistical simulations in R
 
 ## Overview
 

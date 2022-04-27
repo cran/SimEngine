@@ -24,24 +24,23 @@ The original simulation object but with the results attached (along
 \description{
 This is the workhorse function of \pkg{SimEngine} that actually
     runs the simulation. This should be called after all functions that set
-    up the simulation (\code{add_creator}, \code{set_config}, etc.) have been
+    up the simulation (\code{set_config}, \code{set_script}, etc.) have been
     called.
 }
 \examples{
 # The following is a toy example of a simulation, illustrating the use of
 # the run function.
 sim <- new_sim()
-sim \%<>\% add_creator("create_data", function(n) { rpois(n, lambda=5) })
-sim \%<>\% add_method("estimator_1", function(dat) { mean(dat) })
-sim \%<>\% add_method("estimator_2", function(dat) { var(dat) })
-sim \%<>\% set_levels(
-  "n" = c(10, 100, 1000),
-  "estimator" = c("estimator_1", "estimator_2")
-)
+create_data <- function(n) { rpois(n, lambda=5) }
+est_mean <- function(dat, type) {
+  if (type=="M") { return(mean(dat)) }
+  if (type=="V") { return(var(dat)) }
+}
+sim \%<>\% set_levels(n=c(10,100,1000), est=c("M","V"))
 sim \%<>\% set_config(num_sim=1)
 sim \%<>\% set_script(function() {
   dat <- create_data(L$n)
-  lambda_hat <- use_method(L$estimator, list(dat))
+  lambda_hat <- est_mean(dat=dat, type=L$est)
   return (list("lambda_hat"=lambda_hat))
 })
 sim \%<>\% run()

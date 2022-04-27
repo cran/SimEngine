@@ -2,7 +2,7 @@
 #'
 #' @description This is the workhorse function of \pkg{SimEngine} that actually
 #'     runs the simulation. This should be called after all functions that set
-#'     up the simulation (\code{add_creator}, \code{set_config}, etc.) have been
+#'     up the simulation (\code{set_config}, \code{set_script}, etc.) have been
 #'     called.
 #' @param sim A simulation object of class \code{sim_obj}, usually created by
 #'     \code{\link{new_sim}}
@@ -18,17 +18,16 @@
 #' # The following is a toy example of a simulation, illustrating the use of
 #' # the run function.
 #' sim <- new_sim()
-#' sim %<>% add_creator("create_data", function(n) { rpois(n, lambda=5) })
-#' sim %<>% add_method("estimator_1", function(dat) { mean(dat) })
-#' sim %<>% add_method("estimator_2", function(dat) { var(dat) })
-#' sim %<>% set_levels(
-#'   "n" = c(10, 100, 1000),
-#'   "estimator" = c("estimator_1", "estimator_2")
-#' )
+#' create_data <- function(n) { rpois(n, lambda=5) }
+#' est_mean <- function(dat, type) {
+#'   if (type=="M") { return(mean(dat)) }
+#'   if (type=="V") { return(var(dat)) }
+#' }
+#' sim %<>% set_levels(n=c(10,100,1000), est=c("M","V"))
 #' sim %<>% set_config(num_sim=1)
 #' sim %<>% set_script(function() {
 #'   dat <- create_data(L$n)
-#'   lambda_hat <- use_method(L$estimator, list(dat))
+#'   lambda_hat <- est_mean(dat=dat, type=L$est)
 #'   return (list("lambda_hat"=lambda_hat))
 #' })
 #' sim %<>% run()
@@ -43,9 +42,6 @@ run.sim_obj <- function(sim, sim_uids=NA) {
 
   sim$vars$start_time <- Sys.time()
 
-  # All objects will be stored in this environment
-  env <- sim$vars$env
-
   if (is.na(sim_uids)) {
   # !!!!! add error handling for sim_uids
     if (!is.na(sim$internals$tid)) {
@@ -57,15 +53,11 @@ run.sim_obj <- function(sim, sim_uids=NA) {
     }
   }
 
-  if (!sim$internals$update_sim){
-
+  if (!sim$internals$update_sim) {
     # Create levels_grid_big
     levels_grid_big <- create_levels_grid_big(sim)
     sim$internals$levels_grid_big <- levels_grid_big
-  }# else{
-  #  sim_uids <- sim$internals$levels_grid_big$sim_uid
-  #}
-
+  }
 
   # Set up parallelization code
   if (sim$config$parallel %in% c("inner", "outer")) {
@@ -87,8 +79,9 @@ run.sim_obj <- function(sim, sim_uids=NA) {
 
     # Create cluster and export everything in env
     cl <- parallel::makeCluster(n_cores)
-    parallel::clusterExport(cl, ls(env), env)
+    parallel::clusterExport(cl, ls(sim$vars$env), sim$vars$env)
     parallel::clusterExport(cl, c("sim","..packages"), environment())
+    parallel::clusterExport(cl, "..env", .GlobalEnv)
     parallel::clusterCall(cl, function(x) {.libPaths(x)}, .libPaths())
     parallel::clusterEvalQ(cl, sapply(..packages, function(p) {
       do.call("library", list(p))
@@ -99,29 +92,26 @@ run.sim_obj <- function(sim, sim_uids=NA) {
 
     ..start_time <- Sys.time()
 
-    # Set up references to levels row (L) and constants (C)
-    assign(x="C", value=sim$constants, envir=env)
+    # Set up references to levels row (L)
     L <- as.list(sim$internals$levels_grid_big[
       sim$internals$levels_grid_big$sim_uid == i,
     ])
     levs <- names(sim$levels)
     for (j in 1:length(levs)) {
+      # Handle list-type levels
       if (sim$internals$levels_types[j]) {
         L[[levs[j]]] <- sim$levels[[levs[j]]][[L[[levs[j]]]]]
       }
     }
-    assign(x="L", value=L, envir=env)
+    for (obj_name in ls(sim$vars$env)) {
+      obj <- get(obj_name, envir=sim$vars$env, inherits=FALSE)
+      if (methods::is(obj,"function")) {
+        assign(x="L", value=L, envir=environment(obj))
+      }
+    }
+    assign(x="L", value=L, envir=sim$vars$env)
     rm(levs)
     rm(L)
-
-    # Create a reference to the environment that can be searched for via get()
-    #     by methods (currently only use_method) that need to access the
-    #     simulation environment but don't take sim as an argument
-    assign(x="..env", value=env, envir=env)
-
-    # Create ..added_methods vector that use_method() will check to test whether
-    #     a called method has been added to the simulation object
-    assign(x="..added_methods", value=names(sim$methods), envir=env)
 
     # Set the seed
     set.seed(sim$config$seed)
@@ -129,21 +119,25 @@ run.sim_obj <- function(sim, sim_uids=NA) {
 
     # Actually run the run
     # Use withCallingHandlers to catch all warnings and tryCatch to catch errors
-    withCallingHandlers(
-      {.gotWarnings <- character(0) # holds the warnings
-      if (sim$config$stop_at_error==TRUE & Sys.getenv("sim_run")=="") {
-        script_results <- do.call(what="..script", args=list(), envir=env)
-      } else {
-        script_results <- tryCatch(
-          expr = do.call(what="..script", args=list(), envir=env),
-          error = function(e){ return(e) }
-        )
-      }},
-      warning = function(w){
-        .gotWarnings <<- c(.gotWarnings, conditionMessage(w))
-        invokeRestart("muffleWarning")
-      }
-    )
+    .gotWarnings <- character(0) # holds the warnings
+    .catch_errors_and_warnings <- as.logical(sim$config$stop_at_error==FALSE ||
+                                               Sys.getenv("sim_run")!="")
+    if (.catch_errors_and_warnings) {
+      withCallingHandlers(
+        expr = {
+          script_results <- tryCatch(
+            expr = do.call(what="..script", args=list(), envir=sim$vars$env),
+            error = function(e) { return(e) }
+          )
+        },
+        warning = function(w) {
+          .gotWarnings <<- c(.gotWarnings, conditionMessage(w))
+          invokeRestart("muffleWarning")
+        }
+      )
+    } else {
+      script_results <- do.call(what="..script", args=list(), envir=sim$vars$env)
+    }
 
     runtime <- as.numeric(difftime(Sys.time(), ..start_time), units="secs")
 
@@ -185,7 +179,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
     } else {
       results_lists_ok[[length(results_lists_ok)+1]] <- results_lists[[i]]
     }
-    if (length(results_lists[[i]]$warnings) > 0){
+    if (length(results_lists[[i]]$warnings) > 0) {
       results_lists_warn[[length(results_lists_warn)+1]] <- results_lists[[i]]
     }
   }
@@ -247,7 +241,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
       sim$results_complex <- results_complex
     }
 
-    # Join results data frames with `levels_grid_big`and attach to sim
+    # Join results data frames with `levels_grid_big` and attach to sim
     results_df <- dplyr::inner_join(
       sim$internals$levels_grid_big,
       results_df,
@@ -260,7 +254,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
   # Convert errors to data frame
   if (num_err>0) {
 
-    results_lists_err <- lapply(results_lists_err, function(r){
+    results_lists_err <- lapply(results_lists_err, function(r) {
       list("sim_uid" = r$sim_uid,
            "runtime" = r$runtime,
            "message" = r$results$message,
@@ -269,7 +263,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
     })
     errors_df <- data.table::rbindlist(results_lists_err)
 
-    # Join error data frames with `levels_grid_big`and attach to sim
+    # Join error data frames with `levels_grid_big` and attach to sim
     errors_df <- dplyr::inner_join(
       sim$internals$levels_grid_big,
       errors_df,
@@ -282,14 +276,14 @@ run.sim_obj <- function(sim, sim_uids=NA) {
   # Convert warnings to data frame
   if (num_warn>0) {
 
-    results_lists_warn <- lapply(results_lists_warn, function(r){
+    results_lists_warn <- lapply(results_lists_warn, function(r) {
       list("sim_uid" = r$sim_uid,
            "runtime" = r$runtime,
            "message" = paste(r$warnings, collapse="; "))
     })
     warn_df <- data.table::rbindlist(results_lists_warn)
 
-    # Join warnings data frames with `levels_grid_big`and attach to sim
+    # Join warnings data frames with `levels_grid_big` and attach to sim
     warn_df <- dplyr::inner_join(
       sim$internals$levels_grid_big,
       warn_df,
@@ -300,9 +294,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
   }
 
   # Set states
-  if (num_warn==0) {
-    sim$warnings <- "No warnings"
-  }
+  if (num_warn==0) { sim$warnings <- "No warnings" }
   if (num_ok>0 && num_err>0) {
     sim$vars$run_state <- "run, some errors"
   } else if (num_ok>0) {
@@ -312,7 +304,7 @@ run.sim_obj <- function(sim, sim_uids=NA) {
     sim$vars$run_state <- "run, all errors"
     sim$results <- "Errors detected in 100% of simulation replicates"
   } else {
-    stop("An unknown error occurred")
+    stop("An unknown error occurred (CODE 101)")
   }
 
   message(comp_msg)
@@ -327,6 +319,9 @@ run.sim_obj <- function(sim, sim_uids=NA) {
   sim$internals$levels_prev <- sim$internals$levels_shallow
   sim$internals$num_sim_prev <- sim$config$num_sim
   sim$internals$num_sim_cumul <- sim$internals$num_sim_cuml + length(sim_uids)
+
+  # Remove global L if it was created
+  suppressWarnings( rm("L", envir=.GlobalEnv) )
 
   return (sim)
 

@@ -18,30 +18,13 @@ print.sim_obj <- function(x, ...) {
       cat(paste0("    ",names(sim$levels)[i],": ",sim$levels[i],"\n"))
     }
   }
-  if (length(sim$constants)>0) {
-    cat("Constants: \n")
-    for (i in 1:length(sim$constants)) {
-      cat(paste0("    ",names(sim$constants)[i],"\n"))
-    }
-  }
-  if (length(sim$creators)>0) {
-    cat("Creators: \n")
-    for (i in 1:length(sim$creators)) {
-      cat(paste0("    ",names(sim$creators)[i],"\n"))
-    }
-  }
-  if (length(sim$methods)>0) {
-    cat("Methods: \n")
-    for (i in 1:length(sim$methods)) {
-      cat(paste0("    ",names(sim$methods)[i],"\n"))
-    }
-  }
   if (length(sim$scripts)>0) {
     cat("Scripts: \n")
     for (i in 1:length(sim$scripts)) {
       cat(paste0("    ",names(sim$scripts)[i],"\n"))
     }
   }
+  cat(paste0("State: ",sim$vars$run_state,"\n"))
 }
 
 
@@ -58,9 +41,7 @@ print.sim_obj <- function(x, ...) {
 #' @noRd
 handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
-  if (is.na(name)) {
-    name <- deparse(substitute(obj))
-  }
+  if (is.na(name)) { name <- deparse(substitute(obj)) }
 
   # Throw error (without function call) if obj is not found
   tryCatch(.e <- obj, error = function(e) {
@@ -71,8 +52,8 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
   switch(err,
 
     "is.sim_obj" = {
-      if (class(obj)!="sim_obj") {
-        if(is.na(msg)) {
+      if (!methods::is(obj,"sim_obj")) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be of class `sim_obj`")
         }
         stop(msg, call.=FALSE)
@@ -81,7 +62,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.boolean" = {
       if (!(is.logical(obj) && length(obj) == 1)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be of type 'logical', of length 1")
         }
         stop(msg, call.=FALSE)
@@ -90,7 +71,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.numeric" = {
       if (!(is.numeric(obj) && length(obj) == 1)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be numeric, of length 1")
         }
         stop(msg, call.=FALSE)
@@ -99,7 +80,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.numeric.vec" = {
       if (!(is.numeric(obj))) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be numeric")
         }
         stop(msg, call.=FALSE)
@@ -110,7 +91,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
       if (length(obj)>1) {
         stop(paste0("`",name,"` cannot be a vector"), call.=FALSE)
       } else if (!(obj %in% other)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("'",obj,"' is not a valid option for `",name,"`")
         }
         stop(msg, call.=FALSE)
@@ -119,7 +100,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.function" = {
       if (!is.function(obj)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be a function")
         }
         stop(msg, call.=FALSE)
@@ -128,7 +109,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.character" = {
       if (!(is.character(obj) && length(obj)==1)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be a character string, of length 1")
         }
         stop(msg, call.=FALSE)
@@ -137,7 +118,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.character.vec" = {
       if (!(is.character(obj))) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must be a character vector")
         }
         stop(msg, call.=FALSE)
@@ -146,7 +127,7 @@ handle_errors <- function(obj, err, name=NA, other=NA, msg=NA) {
 
     "is.null" = {
       if (is.null(obj)) {
-        if(is.na(msg)) {
+        if (is.na(msg)) {
           msg <- paste0("`",name,"` must not be NULL")
         }
         stop(msg, call.=FALSE)

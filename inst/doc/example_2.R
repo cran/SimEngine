@@ -4,22 +4,23 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----setup--------------------------------------------------------------------
+## ----setup, message = FALSE---------------------------------------------------
+library(tidyr)
 library(SimEngine)
 
 ## -----------------------------------------------------------------------------
 sim <- new_sim()
 
-sim %<>% add_creator("create_regression_data", function(n) {
+create_regression_data <- function(n) {
   beta <- c(-1, 10)
   x <- rnorm(n)
   sigma2 <- exp(x)
   y <- rnorm(n=n, mean=(beta[1]+beta[2]*x), sd = sqrt(sigma2))
   return(data.frame(x=x, y=y))
-})
+}
 
 ## ---- message = FALSE, fig.width = 6------------------------------------------
-dat <- sim$creators$create_regression_data(n=500)
+dat <- create_regression_data(n=500)
 linear_model <- lm(y~x, data=dat)
 dat$residuals <- linear_model$residuals
 
@@ -30,15 +31,15 @@ ggplot(dat, aes(x=x, y=residuals)) +
   labs(x="x", y="residual")
 
 ## -----------------------------------------------------------------------------
-sim %<>% add_method("model_vcov", function(data){
+model_vcov <- function(data) {
   mod <- lm(y~x, data=data)
   return(list("coef"=mod$coefficients, "vcov"=diag(vcov(mod))))
-})
+}
 
-sim %<>% add_method("sandwich_vcov", function(data){
+sandwich_vcov <- function(data) {
   mod <- lm(y~x, data=data)
   return(list("coef"=mod$coefficients, "vcov"=diag(vcovHC(mod))))
-})
+}
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_script(function() {
@@ -97,7 +98,8 @@ plot_results <- function(which_graph, n_est) {
       names_to = "parameter",
       names_prefix = "mean_se_"
     ) %>%
-    ggplot(aes(x=n, y=1.96*value, color=estimator)) +
+    dplyr::mutate(value_j = jitter(value, amount = 0.01)) %>%
+    ggplot(aes(x=n, y=1.96*value_j, color=estimator)) +
     geom_line(aes(linetype=parameter)) +
     geom_point() +
     theme_bw() +
@@ -120,6 +122,7 @@ plot_results <- function(which_graph, n_est) {
       names_to = "parameter",
       names_prefix = "cov_"
     ) %>%
+    dplyr::mutate(value_j = jitter(value, amount = 0.01)) %>%
     ggplot(aes(x=n, y=value, color=estimator)) +
     geom_line(aes(linetype = parameter)) +
     geom_point() +
@@ -141,15 +144,14 @@ plot_results <- function(which_graph, n_est) {
 }
 
 ## ---- message = FALSE, fig.width = 6------------------------------------------
-library(tidyr)
 plot_results("width", 2)
 plot_results("coverage", 2)
 
 ## -----------------------------------------------------------------------------
-sim %<>% add_method("bootstrap_vcov", function(data) {
+bootstrap_vcov <- function(data) {
   mod <- lm(y~x, data=data)
   boot_ests <- matrix(NA, nrow=100, ncol=2)
-  for (j in 1:100){
+  for (j in 1:100) {
     indices <- sample(1:nrow(data), size=nrow(data), replace=TRUE)
     boot_dat <- data[indices,]
     boot_mod <- lm(y~x, data=boot_dat)
@@ -158,7 +160,7 @@ sim %<>% add_method("bootstrap_vcov", function(data) {
   boot_v1 <- var(boot_ests[,1])
   boot_v2 <- var(boot_ests[,2])
   return(list("coef"=mod$coefficients, "vcov"=c(boot_v1, boot_v2)))
-})
+}
 
 sim %<>% set_levels(
   estimator = c("model_vcov", "sandwich_vcov", "bootstrap_vcov"),
@@ -166,7 +168,7 @@ sim %<>% set_levels(
 )
 
 sim %<>% set_config(
-  num_sim=500,
+  num_sim = 500,
   seed = 24,
   parallel = "outer",
   n_cores = 2,

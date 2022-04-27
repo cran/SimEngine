@@ -38,8 +38,7 @@ run_c <- function(ret=FALSE, cmplx=FALSE) {
     )
   }
 
-
-  # The `sim` object should have been created in this environment
+  # The simulation object should have been created in this environment
   if (ret) { return (sim) }
 
 }
@@ -107,7 +106,6 @@ test_that("run_on_cluster() 'last' section works", {
 Sys.setenv(sim_run="")
 unlink("sim.rds")
 rm(sim)
-# rm(output)
 
 # Correct behavior if 'first' fails
 # Create wrapper function for testing run_on_cluster()
@@ -173,13 +171,11 @@ Sys.setenv(SLURM_ARRAY_TASK_ID="")
 Sys.setenv(sim_run="last")
 run_c(cmplx=TRUE)
 sim <- readRDS("sim.rds")
-# output <- readChar("sim_output.txt", file.info("sim_output.txt")$size)
 test_that("run_on_cluster() works with complex data", {
   expect_equal(dir.exists("sim_results"), FALSE)
   expect_equal(sim$results$sum, c(6,6))
   expect_equal(sim$errors, "No errors")
   expect_equal(sim$config$num_sim, 2)
-  # expect_equal(grepl("level_id alpha", output, fixed=TRUE), TRUE)
   expect_equal(length(sim$results_complex), 2)
   expect_equal(class(sim$results_complex), "list")
   expect_equal(sim$results_complex[[1]]$vec, c(2,4))
@@ -187,7 +183,6 @@ test_that("run_on_cluster() works with complex data", {
 Sys.setenv(sim_run="")
 unlink("sim.rds")
 rm(sim)
-# rm(output)
 # !!!!! test update_on_cluster with complex data
 
 
@@ -245,3 +240,177 @@ test_that("run_on_cluster() 'last' section works", {
 Sys.setenv(sim_run="")
 unlink("sim.rds")
 rm(sim)
+
+
+
+
+
+
+
+
+
+
+# Function scoping (cluster 1a)
+Sys.setenv(sim_run="")
+run_on_cluster(
+  first = {
+    sim3 <- new_sim()
+    return_one <- function() { 1 }
+    access_level <- function() { L$alpha }
+    fn_outer <- function(x) { fn_inner(x) }
+    fn_inner <- function(x) { x }
+    glb <- list(beta=4)
+    access_glb <- function() { glb$beta }
+    create_data <- function() {
+      w <- return_one()
+      x <- fn_outer(fn_inner(return_one()))
+      y <- access_level()
+      z <- access_glb()
+      return (list(w=w,x=x,y=y,z=z))
+    }
+    sim3 %<>% set_levels(alpha=c(2,3))
+    sim3 %<>% set_config(num_sim=1)
+    sim3 %<>% set_script(function() {
+      d <- create_data()
+      return (d)
+    })
+  },
+  main = { sim3 %<>% run() },
+  last = {},
+  cluster_config = list(js="ge")
+)
+test_that("Simulation ran and all objects were accessible (cluster 1)", {
+  expect_equal(sim3$results[1,"w"], 1)
+  expect_equal(sim3$results[1,"x"], 1)
+  expect_equal(sim3$results[1,"y"], 2)
+  expect_equal(sim3$results[2,"y"], 3)
+  expect_equal(sim3$results[1,"z"], 4)
+})
+
+# Function scoping (cluster 1b)
+Sys.setenv(sim_run="")
+return_one <- function() { 1 }
+access_level <- function() { L$alpha }
+fn_outer <- function(x) { fn_inner(x) }
+fn_inner <- function(x) { x }
+glb <- list(beta=4)
+access_glb <- function() { glb$beta }
+create_data <- function() {
+  w <- return_one()
+  x <- fn_outer(fn_inner(return_one()))
+  y <- access_level()
+  z <- access_glb()
+  return (list(w=w,x=x,y=y,z=z))
+}
+run_on_cluster(
+  first = {
+    sim3 <- new_sim()
+    sim3 %<>% set_levels(alpha=c(2,3))
+    sim3 %<>% set_config(num_sim=1)
+    sim3 %<>% set_script(function() {
+      d <- create_data()
+      return (d)
+    })
+  },
+  main = {
+    sim3 %<>% run()
+  },
+  last = {},
+  cluster_config = list(js="ge")
+)
+test_that("Simulation ran and all objects were accessible (cluster 1)", {
+  expect_equal(sim3$results[1,"w"], 1)
+  expect_equal(sim3$results[1,"x"], 1)
+  expect_equal(sim3$results[1,"y"], 2)
+  expect_equal(sim3$results[2,"y"], 3)
+  expect_equal(sim3$results[1,"z"], 4)
+})
+
+# Function scoping (cluster 2a)
+Sys.setenv(SLURM_ARRAY_TASK_ID="1")
+for (sr in c("first", "main", "last")) {
+  Sys.setenv(sim_run=sr)
+  run_on_cluster(
+    first = {
+      sim3 <- new_sim()
+      return_one <- function() { 1 }
+      access_level <- function() { L$alpha }
+      fn_outer <- function(x) { fn_inner(x) }
+      fn_inner <- function(x) { x }
+      glb <- list(beta=4)
+      access_glb <- function() { glb$beta }
+      create_data <- function() {
+        w <- return_one()
+        x <- fn_outer(fn_inner(return_one()))
+        y <- access_level()
+        z <- access_glb()
+        return (list(w=w,x=x,y=y,z=z))
+      }
+      sim3 %<>% set_levels(alpha=c(2,3))
+      sim3 %<>% set_config(num_sim=1)
+      sim3 %<>% set_script(function() {
+        d <- create_data()
+        return (d)
+      })
+    },
+    main = {
+      sim3 %<>% run()
+    },
+    last = {},
+    cluster_config = list(js="slurm")
+  )
+}
+sim3 <- readRDS("sim.rds")
+test_that("Simulation ran and all objects were accessible (cluster 1)", {
+  expect_equal(sim3$results[1,"w"], 1)
+  expect_equal(sim3$results[1,"x"], 1)
+  expect_equal(sim3$results[1,"y"], 2)
+  expect_equal(sim3$results[1,"z"], 4)
+})
+rm(sim3)
+unlink("sim.rds")
+
+# Function scoping (cluster 2b)
+Sys.setenv(SLURM_ARRAY_TASK_ID="1")
+for (sr in c("first", "main", "last")) {
+  Sys.setenv(sim_run=sr)
+  return_one <- function() { 1 }
+  access_level <- function() { L$alpha }
+  fn_outer <- function(x) { fn_inner(x) }
+  fn_inner <- function(x) { x }
+  glb <- list(beta=4)
+  access_glb <- function() { glb$beta }
+  create_data <- function() {
+    w <- return_one()
+    x <- fn_outer(fn_inner(return_one()))
+    y <- access_level()
+    z <- access_glb()
+    return (list(w=w,x=x,y=y,z=z))
+  }
+  run_on_cluster(
+    first = {
+      sim3 <- new_sim()
+      sim3 %<>% set_levels(alpha=c(2,3))
+      sim3 %<>% set_config(num_sim=1)
+      sim3 %<>% set_script(function() {
+        d <- create_data()
+        return (d)
+      })
+    },
+    main = {
+      sim3 %<>% run()
+    },
+    last = {},
+    cluster_config = list(js="slurm")
+  )
+}
+sim3 <- readRDS("sim.rds")
+test_that("Simulation ran and all objects were accessible (cluster 1)", {
+  expect_equal(sim3$results[1,"w"], 1)
+  expect_equal(sim3$results[1,"x"], 1)
+  expect_equal(sim3$results[1,"y"], 2)
+  expect_equal(sim3$results[1,"z"], 4)
+})
+Sys.setenv(sim_run="")
+rm(sim3)
+unlink("sim.rds")

@@ -1,7 +1,8 @@
 
 # This file will update the "function reference" section of the SimEngine
 #     website (https://avi-kenny.github.io/SimEngine/function-reference)
-# !!!!! Run this file manually for now (eventually automate it via devtools)
+# !!!!! Run this file manually for now (eventually automate it via devtools);
+# !!!!! it should be run after building the docs (SHFT+CTRL+D)
 
 if (F) {
 
@@ -23,9 +24,9 @@ if (F) {
 
     # Variables
     fn <- fns[i]
-    if (substr(fn, start = nchar(fn) - 5, stop = nchar(fn)) == ".sim_obj"){
+    if (substr(fn, start = nchar(fn) - 5, stop = nchar(fn)) == ".sim_obj") {
       fn2 <- substr(fn, start = 1, stop = nchar(fn) - 6)
-    } else{
+    } else {
       fn2 <- fn
     }
     path_rd <- paste0("man/", fn, ".Rd")

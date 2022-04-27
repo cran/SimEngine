@@ -12,6 +12,7 @@ library(SimEngine)
 sim <- new_sim()
 
 ## -----------------------------------------------------------------------------
+# Code up the dataset-generating function
 create_rct_data <- function (num_patients) {
   df <- data.frame(
     "patient_id" = integer(),
@@ -28,55 +29,48 @@ create_rct_data <- function (num_patients) {
   return (df)
 }
 
-# Test our creator function
+# Test the function
 create_rct_data(5)
 
 ## -----------------------------------------------------------------------------
-sim %<>% add_creator(create_rct_data)
-
-## -----------------------------------------------------------------------------
-estimator_1 <- function(df) {
+# Code up the estimators
+est_tx_effect <- function(df, type) {
   n <- nrow(df)
-  true_prob <- 0.5
   sum_t <- sum(df$outcome * (df$group=="treatment"))
   sum_c <- sum(df$outcome * (df$group=="control"))
-  return ( sum_t/(n*true_prob) - sum_c/(n*(1-true_prob)) )
-}
-estimator_2 <- function(df) {
-  n <- nrow(df)
-  est_prob <- sum(df$group=="treatment") / n
-  sum_t <- sum(df$outcome * (df$group=="treatment"))
-  sum_c <- sum(df$outcome * (df$group=="control"))
-  return ( sum_t/(n*est_prob) - sum_c/(n*(1-est_prob)) )
+  if (type=="est1") {
+    true_prob <- 0.5
+    return ( sum_t/(n*true_prob) - sum_c/(n*(1-true_prob)) )
+  } else if (type=="est2") {
+    est_prob <- sum(df$group=="treatment") / n
+    return ( sum_t/(n*est_prob) - sum_c/(n*(1-est_prob)) )
+  }
 }
 
-# Test our estimator functions
+# Test out the estimators
 df <- create_rct_data(10000)
-estimator_1(df)
-estimator_2(df)
-
-## -----------------------------------------------------------------------------
-sim %<>% add_method(estimator_1)
-sim %<>% add_method(estimator_2)
+est_tx_effect(df, "est1")
+est_tx_effect(df, "est2")
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_levels(
-  estimator = c("estimator_1", "estimator_2"),
+  estimator = c("est1", "est2"),
   num_patients = c(50, 200, 1000)
 )
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_script(function() {
   df <- create_rct_data(L$num_patients)
-  estimate <- use_method(L$estimator, list(df))
-  return (list("estimate"=estimate))
+  est <- est_tx_effect(df, L$estimator)
+  return (list("est"=est))
 })
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_config(
   num_sim = 10,
   n_cores = 2,
-  parallel = "outer"
+  parallel = "outer",
+  packages = c("ggplot2", "stringr")
 )
 
 ## -----------------------------------------------------------------------------
@@ -84,8 +78,8 @@ sim %<>% run()
 
 ## -----------------------------------------------------------------------------
 sim %>% summarize(
-  bias = list(name="bias_ate", truth=-7, estimate="estimate"),
-  mse = list(name="mse_ate", truth=-7, estimate="estimate")
+  bias = list(truth=-7, estimate="est"),
+  mse = list(truth=-7, estimate="est")
 )
 
 ## -----------------------------------------------------------------------------

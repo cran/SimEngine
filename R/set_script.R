@@ -10,8 +10,8 @@
 #'     categorized as simple (a number, a character string, etc.) or complex
 #'     (vectors, dataframes, lists, etc.). Complex data must go inside a key
 #'     called ".complex" and the associated value must be a list (see examples).
-#'     The function body can contain references to the special objects \code{L}
-#'     (simulation levels) and \code{C} (simulation constants) (see examples).
+#'     The function body can contain references to the special object \code{L}
+#'     that stores the current set of simulation levels (see examples).
 #'     The keys must be valid R names (see ?make.names).
 #' @return The original simulation object with the new "simulation script"
 #'     function added.
@@ -19,17 +19,16 @@
 #' # The following is a toy example of a simulation, illustrating the use of
 #' # the set_script function.
 #' sim <- new_sim()
-#' sim %<>% add_creator("create_data", function(n) { rpois(n, lambda=5) })
-#' sim %<>% add_method("estimator_1", function(dat) { mean(dat) })
-#' sim %<>% add_method("estimator_2", function(dat) { var(dat) })
-#' sim %<>% set_levels(
-#'   "n" = c(10, 100, 1000),
-#'   "estimator" = c("estimator_1", "estimator_2")
-#' )
+#' create_data <- function(n) { rpois(n, lambda=5) }
+#' est_mean <- function(dat, type) {
+#'   if (type=="M") { return(mean(dat)) }
+#'   if (type=="V") { return(var(dat)) }
+#' }
+#' sim %<>% set_levels(n=c(10,100,1000), est=c("M","V"))
 #' sim %<>% set_config(num_sim=1)
 #' sim %<>% set_script(function() {
 #'   dat <- create_data(L$n)
-#'   lambda_hat <- use_method(L$estimator, list(dat))
+#'   lambda_hat <- est_mean(dat=dat, type=L$est)
 #'   return (list("lambda_hat"=lambda_hat))
 #' })
 #' sim %<>% run()
@@ -63,6 +62,16 @@ set_script.sim_obj <- function(sim, fn) {
   if (substr(sim$vars$run_state, 1, 3) == "run") {
     stop(paste("A simulation object's script cannot be changed after the",
                "simulation has been run."))
+  }
+
+  # Add "global" objects to simulation object run environment (excluding
+  #     simulation object); these are not necessarily in the global environment,
+  #     but are in the environment the new_sim() call is executed within.
+  for (obj_name in ls(sim$internals$env_calling)) {
+    obj <- get(x=obj_name, envir=sim$internals$env_calling)
+    if (!methods::is(obj,"sim_obj") && obj_name!="L") {
+      assign(x=obj_name, value=obj, envir=sim$vars$env)
+    }
   }
 
   environment(fn) <- sim$vars$env
