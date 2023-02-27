@@ -40,7 +40,7 @@ sim %<>% set_config(num_sim=1000)
 sim %<>% run()
 
 power_sim <- sim %>% summarize(
-  mean = list(name="power", x="reject")
+  list(stat="mean", name="power", x="reject")
 )
 print(power_sim)
 

@@ -4,14 +4,7 @@
 \alias{update_sim_on_cluster}
 \title{Framework for updating simulations on a cluster computing system}
 \usage{
-update_sim_on_cluster(
-  first,
-  main,
-  last,
-  cluster_config,
-  keep_errors = TRUE,
-  keep_extra = FALSE
-)
+update_sim_on_cluster(first, main, last, cluster_config, keep_errors = T)
 }
 \arguments{
 \item{first}{Code to run before executing additional simulation replicates. For example,
@@ -45,12 +38,6 @@ code).}
 \item{keep_errors}{logical (\code{TRUE} by default); if \code{TRUE}, do not
 try to re-run simulation reps that results in errors previously; if
 \code{FALSE}, attempt to run those reps again}
-
-\item{keep_extra}{logical (\code{FALSE} by default); if \code{TRUE}, keep
-previously run simulation reps even if they exceed the current
-\code{num_sim} in config or are from a level that has been dropped; if
-\code{FALSE}, drop excess reps (starting from the last rep for that
-particular simulation level)}
 }
 \description{
 This function serves a scaffold for updating a previously-run in
@@ -80,7 +67,7 @@ run_on_cluster(
     create_data <- function(n) { rnorm(n) }
     sim \%<>\% set_script(function() {
       data <- create_data(L$n)
-      return(mean(data))
+      return(list("x"=mean(data)))
     })
     sim \%<>\% set_levels(n=c(100,1000))
     sim \%<>\% set_config(num_sim=10)
@@ -91,7 +78,7 @@ run_on_cluster(
   },
 
   last = {
-    sim \%<>\% summarize()
+    sim \%>\% summarize()
   },
 
   cluster_config = list(js="ge")
@@ -123,7 +110,7 @@ update_sim_on_cluster(
   },
 
   last = {
-    sim \%<>\% summarize()
+    sim \%>\% summarize()
   },
 
   cluster_config = list(js="ge")

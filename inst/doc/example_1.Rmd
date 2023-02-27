@@ -70,13 +70,13 @@ sim %<>% set_levels(n=c(20,40,60,80))
 sim %<>% set_config(num_sim=1000)
 ```
 
-We are now ready to run the simulation. After obtaining results, we calculate power by averaging the 'reject' variable using the summarize() function, which tells us the percentage of simulations in which the null hypothesis was rejected.
+We are now ready to run the simulation. After obtaining results, we calculate power by averaging the 'reject' variable using the `summarize` function, which tells us the percentage of simulations in which the null hypothesis was rejected.
 
 ```{r}
 sim %<>% run()
 
 power_sim <- sim %>% summarize(
-  mean = list(name="power", x="reject")
+  list(stat="mean", name="power", x="reject")
 )
 print(power_sim)
 ```
@@ -98,4 +98,4 @@ ggplot(data.frame(
   labs(color="Method", y="Power", x="Sample size (per group)")
 ```
 
-Of course, real applications will typically involve much more complex data generating mechanisms and analyses, but the code above illustrates the basic approach of simulation-based power calculation.
+Of course, real applications will typically involve much more complex data generating mechanisms and analyses, but the same basic principles illustrated in the code above will always apply to simulation-based power calculations.

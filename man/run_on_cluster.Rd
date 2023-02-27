@@ -8,16 +8,17 @@ run_on_cluster(first, main, last, cluster_config)
 }
 \arguments{
 \item{first}{Code to run at the start of a simulation. This should be a block
-of code enclosed by curly braces {} that that creates a simulation
-object. Put everything you need in the simulation object, since global
-variables declared in this block will not be available when the 'main'
-and 'last' code blocks run.}
+of code enclosed by curly braces {} that creates a simulation object. Put
+everything you need in the simulation object, since global variables
+declared in this block will not be available when the 'main' and 'last'
+code blocks run.}
 
 \item{main}{Code that will run for every simulation replicate. This should be
-a block of code enclosed by curly braces {} that includes a call to
-\code{\link{run}}. This code block will have access to the simulation
-object you created in the 'first' code block, but any changes made here
-to the simulation object will not be saved.}
+a block of code enclosed by curly braces {}, and will almost always
+contain only a single call to the \code{\link{run}}) function. This code
+block will have access to the simulation object you created in the
+'first' code block, but any changes made here to the simulation object
+will not be saved.}
 
 \item{last}{Code that will run after all simulation replicates have been run.
 This should be a block of code enclosed by curly braces {} that takes
@@ -36,16 +37,17 @@ to the working directory of the R script that contains your simulation
 code).}
 }
 \description{
-This function serves a scaffold for running simulations in
-    parallel on a cluster computing system. It acts as a wrapper for the code
-    in your simulation script, organizing the code into three sections,
-    labeled "first" (code that is run once at the start of the simulation,
-    e.g. setting simulation levels), "main" (the simulation script, which is
-    run repeatedly), and "last" (code to combine and summarize simulation
-    results). This function interacts with cluster job scheduler software
-    (e.g. Slurm or Oracle Grid Engine) to divide parallel tasks over cluster
-    nodes. See \url{https://avi-kenny.github.io/SimEngine/parallelization/}
-    for an overview of how cluster parallelization works in \pkg{SimEngine}.
+This function allows for simulations to be run in parallel on a
+    cluster computing system (CCS). It acts as a wrapper for the code in your
+    simulation script, organizing the code into three sections, labeled
+    "first" (code that is run once at the start of the simulation, e.g.
+    setting simulation levels), "main" (running the simulation script via
+    \code{\link{run}})), and "last" (usually code to process or summarize
+    simulation results). This function interacts with cluster job scheduler
+    software (e.g. Slurm or Oracle Grid Engine) to divide parallel tasks over
+    cluster nodes. See
+    \url{https://avi-kenny.github.io/SimEngine/parallelization/} for a
+    detailed overview of how CCS parallelization works in \pkg{SimEngine}.
 }
 \examples{
 \dontrun{
@@ -65,7 +67,7 @@ run_on_cluster(
     create_data <- function(n) { rnorm(n) }
     sim \%<>\% set_script(function() {
       data <- create_data(L$n)
-      return(mean(data))
+      return(list("x"=mean(data)))
     })
     sim \%<>\% set_levels(n=c(100,1000))
     sim \%<>\% set_config(num_sim=10)
@@ -76,7 +78,7 @@ run_on_cluster(
   },
 
   last = {
-    sim \%<>\% summarize()
+    sim \%>\% summarize()
   },
 
   cluster_config = list(js="ge")

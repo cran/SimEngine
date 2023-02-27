@@ -14,30 +14,44 @@
 
 <title>Example 1: Simulation-based power calculation</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -49,55 +63,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -106,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -124,7 +144,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -136,19 +336,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">Example 1: Simulation-based power calculation</h1>
+<h1 class="title toc-ignore">Example 1: Simulation-based power
+calculation</h1>
 
 
 
-<p>This vignette is adapted from <a href="https://avi-kenny.github.io/SimEngine/examples/1">Example 1</a> on the SimEngine website.</p>
+<p>This vignette is adapted from
+<a href="https://avi-kenny.github.io/SimEngine/examples/1">Example 1</a>
+on the SimEngine website.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimEngine)</span></code></pre></div>
-<p>Calculating statistical power is a critical step in the design of experiments. For a given study design, the statistical power is defined as the probability that a hypothesis test correctly rejects the null hypothesis (assuming it is false). Sometimes, the sample size for a study is considered fixed, and interest lies in calculating power. More often, investigators want to know what sample size is needed to reject the null hypothesis at a given power level (e.g. 80% or 90%). We assume that the reader has some familiarity with statistical hypothesis testing.</p>
-<p>For simple study designs (e.g. an individually randomized controlled trial with two groups), formulas exist to calculate the sample size necessary to reject the null hypothesis under certain assumptions around the distribution of your outcome, the effect size, etc. For example, in an experiment comparing means between two groups, the following formula is used to calculate the necessary sample size to reject a null hypothesis with power <span class="math inline">\(1-\beta\)</span> and type I error rate <span class="math inline">\(\alpha\)</span>, where the outcome variable has means <span class="math inline">\(\mu_0,\mu_1\)</span> and standard deviations <span class="math inline">\(\sigma_0^2,\sigma_1^2\)</span> in the two groups and <span class="math inline">\(z_{\alpha/2}\)</span> and <span class="math inline">\(z_\beta\)</span> represent quantiles of the standard normal distribution:</p>
-<p><span class="math display">\[n = \frac{(z_{\alpha/2}+z_\beta)^2(\sigma_0^2+\sigma_1^2)}{(\mu_0-\mu_1)^2}\]</span></p>
-<p>However, for more complex study designs or analysis plans, formulas may not exist or may be very difficult to adapt to a particular setting. In these situations, an easier approach is to conduct simulation-based power calculations. The basic idea is that you repeatedly simulate your entire experiment and calculate the proportion of experiments in which the null hypothesis is rejected; this is your estimated power. Simulating your entire experiment will typically involve generating a dataset, and then running an analysis that involves a hypothesis test. Randomness is usually introduced into the process through the dataset generation, although sometimes you will fix a population dataset and induce randomization by taking samples from that population (e.g. to simulate survey data analyses). Often, the most difficult part is to simulate a dataset that accurately reflects the nuances (e.g. the correlation structure) of your real dataset.</p>
-<p>If you want to calculate sample size at a fixed power level (e.g. 90%), you can use a “guess and check” approach. With this approach, you select a sample size <span class="math inline">\(n_1\)</span> and run the simulation to estimate your power. If power is estimated to be lower than 90%, you select a new value <span class="math inline">\(n_2\)</span> that is larger than <span class="math inline">\(n_1\)</span> and run the simulation again. You repeat this procedure until the estimated power is roughly 90%.</p>
-<p>We illustrate this process by simulating a randomized controlled trial and comparing our results to what we get from the formula above. We then show how our simulation can be modified to adapt to more complex scenarios.</p>
-<p>First, we declare a new simulation object and write a function to generate data:</p>
+<p>Calculating statistical power is a critical step in the design of
+experiments. For a given study design, the statistical power is defined
+as the probability that a hypothesis test correctly rejects the null
+hypothesis (assuming it is false). Sometimes, the sample size for a
+study is considered fixed, and interest lies in calculating power. More
+often, investigators want to know what sample size is needed to reject
+the null hypothesis at a given power level (e.g. 80% or 90%). We assume
+that the reader has some familiarity with statistical hypothesis
+testing.</p>
+<p>For simple study designs (e.g. an individually randomized controlled
+trial with two groups), formulas exist to calculate the sample size
+necessary to reject the null hypothesis under certain assumptions around
+the distribution of your outcome, the effect size, etc. For example, in
+an experiment comparing means between two groups, the following formula
+is used to calculate the necessary sample size to reject a null
+hypothesis with power <span class="math inline">\(1-\beta\)</span> and
+type I error rate <span class="math inline">\(\alpha\)</span>, where the
+outcome variable has means <span class="math inline">\(\mu_0,\mu_1\)</span> and standard deviations <span class="math inline">\(\sigma_0^2,\sigma_1^2\)</span> in the two groups
+and <span class="math inline">\(z_{\alpha/2}\)</span> and <span class="math inline">\(z_\beta\)</span> represent quantiles of the
+standard normal distribution:</p>
+<p><span class="math display">\[n =
+\frac{(z_{\alpha/2}+z_\beta)^2(\sigma_0^2+\sigma_1^2)}{(\mu_0-\mu_1)^2}\]</span></p>
+<p>However, for more complex study designs or analysis plans, formulas
+may not exist or may be very difficult to adapt to a particular setting.
+In these situations, an easier approach is to conduct simulation-based
+power calculations. The basic idea is that you repeatedly simulate your
+entire experiment and calculate the proportion of experiments in which
+the null hypothesis is rejected; this is your estimated power.
+Simulating your entire experiment will typically involve generating a
+dataset, and then running an analysis that involves a hypothesis test.
+Randomness is usually introduced into the process through the dataset
+generation, although sometimes you will fix a population dataset and
+induce randomization by taking samples from that population (e.g. to
+simulate survey data analyses). Often, the most difficult part is to
+simulate a dataset that accurately reflects the nuances (e.g. the
+correlation structure) of your real dataset.</p>
+<p>If you want to calculate sample size at a fixed power level
+(e.g. 90%), you can use a “guess and check” approach. With this
+approach, you select a sample size <span class="math inline">\(n_1\)</span> and run the simulation to estimate
+your power. If power is estimated to be lower than 90%, you select a new
+value <span class="math inline">\(n_2\)</span> that is larger than <span class="math inline">\(n_1\)</span> and run the simulation again. You
+repeat this procedure until the estimated power is roughly 90%.</p>
+<p>We illustrate this process by simulating a randomized controlled
+trial and comparing our results to what we get from the formula above.
+We then show how our simulation can be modified to adapt to more complex
+scenarios.</p>
+<p>First, we declare a new simulation object and write a function to
+generate data:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>create_rct_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n, mu_0, mu_1, sigma_0, sigma_1) {</span>
@@ -161,18 +405,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Test our data-generating function</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">create_rct_data</span>(<span class="at">n=</span><span class="dv">3</span>, <span class="at">mu_0=</span><span class="dv">3</span>, <span class="at">mu_1=</span><span class="dv">4</span>, <span class="at">sigma_0=</span><span class="fl">0.1</span>, <span class="at">sigma_1=</span><span class="fl">0.1</span>)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   group  outcome</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     0 3.024410</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1 4.071507</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1 3.918332</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1 4.043368</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     0 3.020950</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     0 2.989541</span></span></code></pre></div>
-<p>Next, we add a function that takes a dataset generated by our function and runs a statistical test to decide whether to reject the null hypothesis:</p>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     0 2.918839</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1 3.955013</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     0 2.899228</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1 3.997411</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     1 3.955013</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     0 2.899228</span></span></code></pre></div>
+<p>Next, we add a function that takes a dataset generated by our
+function and runs a statistical test to decide whether to reject the
+null hypothesis:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>run_test <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  test_result <span class="ot">&lt;-</span> <span class="fu">t.test</span>(outcome<span class="sc">~</span>group, <span class="at">data=</span>data)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">as.integer</span>(test_result<span class="sc">$</span>p.value<span class="sc">&lt;</span><span class="fl">0.05</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>Next, we write the simulation script and tell SimEngine to run 1,000 simulation replicates each for four sample sizes.</p>
+<p>Next, we write the simulation script and tell SimEngine to run 1,000
+simulation replicates each for four sample sizes.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">create_rct_data</span>(<span class="at">n=</span>L<span class="sc">$</span>n, <span class="at">mu_0=</span><span class="dv">17</span>, <span class="at">mu_1=</span><span class="dv">18</span>, <span class="at">sigma_0=</span><span class="dv">2</span>, <span class="at">sigma_1=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  reject <span class="ot">&lt;-</span> <span class="fu">run_test</span>(data)</span>
@@ -181,20 +428,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n=</span><span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">40</span>,<span class="dv">60</span>,<span class="dv">80</span>))</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">1000</span>)</span></code></pre></div>
-<p>We are now ready to run the simulation. After obtaining results, we calculate power by averaging the ‘reject’ variable using the summarize() function, which tells us the percentage of simulations in which the null hypothesis was rejected.</p>
+<p>We are now ready to run the simulation. After obtaining results, we
+calculate power by averaging the ‘reject’ variable using the
+<code>summarize</code> function, which tells us the percentage of
+simulations in which the null hypothesis was rejected.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>power_sim <span class="ot">&lt;-</span> sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">&quot;power&quot;</span>, <span class="at">x=</span><span class="st">&quot;reject&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;mean&quot;</span>, <span class="at">name=</span><span class="st">&quot;power&quot;</span>, <span class="at">x=</span><span class="st">&quot;reject&quot;</span>)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(power_sim)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   level_id  n power</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        1 20 0.388</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        2 40 0.587</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3        3 60 0.761</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4        4 80 0.830</span></span></code></pre></div>
-<p>We can compare our results to what we obtain by using the formula stated earlier.</p>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   level_id  n n_reps power</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        1 20   1000 0.378</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        2 40   1000 0.610</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3        3 60   1000 0.729</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4        4 80   1000 0.827</span></span></code></pre></div>
+<p>We can compare our results to what we obtain by using the formula
+stated earlier.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>power_formula <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">40</span>,<span class="dv">60</span>,<span class="dv">80</span>), <span class="cf">function</span>(n) {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pnorm</span>(<span class="fu">sqrt</span>((n<span class="sc">*</span>(<span class="dv">17-18</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>(<span class="dv">2</span><span class="sc">^</span><span class="dv">2</span><span class="sc">+</span><span class="dv">2</span><span class="sc">^</span><span class="dv">2</span>)) <span class="sc">-</span> <span class="fu">qnorm</span>(<span class="fl">0.025</span>, <span class="at">lower.tail=</span>F))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>})</span>
@@ -207,8 +458,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>), <span class="fu">aes</span>(<span class="at">x=</span>n, <span class="at">y=</span>power, <span class="at">color=</span><span class="fu">factor</span>(which))) <span class="sc">+</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color=</span><span class="st">&quot;Method&quot;</span>, <span class="at">y=</span><span class="st">&quot;Power&quot;</span>, <span class="at">x=</span><span class="st">&quot;Sample size (per group)&quot;</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>Of course, real applications will typically involve much more complex data generating mechanisms and analyses, but the code above illustrates the basic approach of simulation-based power calculation.</p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Of course, real applications will typically involve much more complex
+data generating mechanisms and analyses, but the same basic principles
+illustrated in the code above will always apply to simulation-based
+power calculations.</p>
 
 
 

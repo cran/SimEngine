@@ -31,7 +31,7 @@ $$Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$$
 
 where $\epsilon_i$ is a mean-zero noise term with variance $\sigma^2_i$. We refer to this as a heteroskedastic model, since the variances need not be equal across all $i$. This is the true data-generating model. (Note: A more restrictive (but misspecified) model assumes that there is a common variance $\sigma^2$ such that $\sigma^2_i = \sigma^2$ for all $i$. We refer to this incorrect model as the homoskedastic model.) 
 
-In linear regression, we use least-squares to estimate the coefficient vector $\beta$. For the purposes of building confidence intervals and performing hypothesis tests, we need to also estimate the standard error of the least squares estimator. There are two common ways to do this: (1) Use a model-based standard error that assume homoskedasticity. This is the estimator used by default in most statistical software (including the `lm()` function in R). (2) Use a so-called sandwich standard error. Statistical theory tells us that estimator will be consistent even under heteroskedasticity. See the Statistical Appendix for more details. 
+In linear regression, we use least-squares to estimate the coefficient vector $\beta$. For the purposes of building confidence intervals and performing hypothesis tests, we need to also estimate the standard error of the least squares estimator. There are two common ways to do this: (1) Use a model-based standard error that assume homoskedasticity. This is the estimator used by default in most statistical software (including the `lm` function in R). (2) Use a so-called sandwich standard error. Statistical theory tells us that estimator will be consistent even under heteroskedasticity. See the Statistical Appendix for more details. 
 
 We will carry out a small simulation study to compare these two estimators. 
 
@@ -109,14 +109,12 @@ Now we can summarize the results using `summarize`. There are two main quantitie
 
 ```{r}
 summarized_results <- sim %>% summarize(
-  mean = list(
-    list(name="mean_se_beta0", x="beta0_se_est"),
-    list(name="mean_se_beta1", x="beta1_se_est")
-  ),
-  coverage = list(
-    list(name="cov_beta0", estimate="beta0_est", se="beta0_se_est", truth=-1),
-    list(name="cov_beta1", estimate="beta1_est", se="beta1_se_est", truth=10)
-  )
+  list(stat="mean", name="mean_se_beta0", x="beta0_se_est"),
+  list(stat="mean", name="mean_se_beta1", x="beta1_se_est"),
+  list(stat="coverage", name="cov_beta0", estimate="beta0_est",
+       se="beta0_se_est", truth=-1),
+  list(stat="coverage", name="cov_beta1", estimate="beta1_est",
+       se="beta1_se_est", truth=10)
 )
 
 print(summarized_results)
@@ -234,14 +232,12 @@ Now that we have the bootstrap results included in our simulation object, we can
 
 ```{r, fig.width = 6}
 summarized_results <- sim %>% summarize(
-  mean = list(
-    list(name="mean_se_beta0", x="beta0_se_est"),
-    list(name="mean_se_beta1", x="beta1_se_est")
-  ),
-  coverage = list(
-    list(name="cov_beta0", estimate="beta0_est", se="beta0_se_est", truth=-1),
-    list(name="cov_beta1", estimate="beta1_est", se="beta1_se_est", truth=10)
-  )
+  list(stat="mean", name="mean_se_beta0", x="beta0_se_est"),
+  list(stat="mean", name="mean_se_beta1", x="beta1_se_est"),
+  list(stat="coverage", name="cov_beta0", estimate="beta0_est",
+       se="beta0_se_est", truth=-1),
+  list(stat="coverage", name="cov_beta1", estimate="beta1_est",
+       se="beta1_se_est", truth=10)
 )
 
 plot_results("width", 3)

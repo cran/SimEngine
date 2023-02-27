@@ -23,7 +23,7 @@ create_rct_data <- function (num_patients) {
   for (i in 1:num_patients) {
     group <- ifelse(sample(c(0,1), size=1)==1, "treatment", "control")
     treatment_effect <- ifelse(group=="treatment", -7, 0)
-    outcome <- rnorm(n=1, mean=130, sd=5) + treatment_effect
+    outcome <- rnorm(n=1, mean=130, sd=2) + treatment_effect
     df[i,] <- list(i, group, outcome)
   }
   return (df)
@@ -48,7 +48,7 @@ est_tx_effect <- function(df, type) {
 }
 
 # Test out the estimators
-df <- create_rct_data(10000)
+df <- create_rct_data(1000)
 est_tx_effect(df, "est1")
 est_tx_effect(df, "est2")
 
@@ -62,14 +62,18 @@ sim %<>% set_levels(
 sim %<>% set_script(function() {
   df <- create_rct_data(L$num_patients)
   est <- est_tx_effect(df, L$estimator)
-  return (list("est"=est))
+  return (list(
+    "est" = est,
+    "mean_t" = mean(df$outcome[df$group=="treatment"]),
+    "mean_c" = mean(df$outcome[df$group=="control"])
+  ))
 })
 
 ## -----------------------------------------------------------------------------
 sim %<>% set_config(
-  num_sim = 10,
-  n_cores = 2,
+  num_sim = 100,
   parallel = "outer",
+  n_cores = 2,
   packages = c("ggplot2", "stringr")
 )
 
@@ -78,8 +82,8 @@ sim %<>% run()
 
 ## -----------------------------------------------------------------------------
 sim %>% summarize(
-  bias = list(truth=-7, estimate="est"),
-  mse = list(truth=-7, estimate="est")
+  list(stat="bias", truth=-7, estimate="est"),
+  list(stat="mse", truth=-7, estimate="est")
 )
 
 ## -----------------------------------------------------------------------------

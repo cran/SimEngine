@@ -1,4 +1,205 @@
 
+# Simple example for batch()
+if (F) {
+
+  sim <- new_sim()
+  create_data <- function(n) { rnorm(n, mean=3) }
+  est_mean <- function(dat, type) {
+    if (type=="est_mean") { return(mean(dat)) }
+    if (type=="est_median") { return(median(dat)) }
+  }
+  sim %<>% set_levels(est=c("est_mean","est_median"))
+  sim %<>% set_config(num_sim=3, batch_levels=NULL)
+  sim %<>% set_script(function() {
+    dat <- create_data(n=100)
+    # batch({
+    #   dat <- create_data(n=100)
+    # })
+    mu_hat <- est_mean(dat=dat, type=L$est)
+    return(list(
+      "mu_hat" = mu_hat,
+      "dat1" = round(dat[1],2),
+      "dat2" = round(dat[2],2),
+      "dat3" = round(dat[3],2)
+    ))
+  })
+  sim %<>% run()
+  sim$results[order(sim$results$rep_id),]
+
+}
+
+# update copy
+if (F) {
+
+  # Scratch 3: profiling
+  if (F) {
+
+    sim <- new_sim()
+    create_data <- function(n, mu) { rnorm(n, mean=mu, sd=0.5) }
+    sim %<>% set_levels(n=c(10,100), mu=c(2,5), est=c("H","E","Y"))
+    sim %<>% set_config(num_sim=3, batch_levels=c("n","mu"))
+    sim %<>% set_script(function() {
+      batch({ dat <- create_data(L$n, L$mu) })
+      return (list("mean_dat" = mean(dat)))
+    })
+    sim %<>% run()
+
+  }
+
+  # Scratch 2 (using this)
+  if (F) {
+
+    sim <- new_sim()
+    create_data <- function(n) { rpois(n, lambda=5) }
+    est_mean <- function(dat, type) {
+      if (type=="M") { return(mean(dat)) }
+      if (type=="V") { return(var(dat)) }
+    }
+    sim %<>% set_levels(n=c(10,100), est="M")
+    sim %<>% set_config(num_sim=5, n_cores=3, parallel="outer")
+    sim %<>% set_script(function() {
+      dat <- create_data(L$n)
+      lambda_hat <- est_mean(dat=dat, type=L$est)
+      return (list(
+        "lambda_hat" = lambda_hat,
+        .complex = list(a=1, b=lambda_hat)
+      ))
+    })
+    sim %<>% run()
+    sim %<>% set_levels(n=c(10,1000), est=c("M","V"))
+    # sim %<>% set_levels(n=c(10,1000), est=c("M","V"), hey=2)
+    sim %<>% set_config(num_sim=3)
+    sim %<>% update_sim()
+
+  }
+
+  # Scratch 1
+  if (F) {
+
+    sim <- new_sim()
+    create_data <- function(n) { rpois(n, lambda=5) }
+    est_mean <- function(dat, type) {
+      if (type=="M") { return(mean(dat)) }
+      if (type=="V") { return(var(dat)) }
+    }
+    sim %<>% set_levels(
+      n = c(10,100,1000),
+      estimator = c("M","V")
+      # estimator = list(
+      #   "est 1" = list(a=1, b=2),
+      #   "est 2" = list(a=3, b=44, c=55)
+      # )
+    )
+    sim %<>% set_config(num_sim=2)
+    sim %<>% set_script(function() {
+      dat <- create_data(L$n)
+      lambda_hat <- est_mean(dat=dat, type=L$est)
+      return (list("lambda_hat"=lambda_hat))
+    })
+    sim %<>% run()
+
+
+
+  }
+
+}
+
+# Testing batch() function: object created within batch()
+if (F) {
+
+  sim <- new_sim()
+  create_data <- function(n, lmbd) { rpois(n, lambda=lmbd) }
+  est_mean <- function(dat, type) {
+    if (type=="M") { return(mean(dat)) }
+    if (type=="V") { return(var(dat)) }
+  }
+  sim %<>% set_levels(n=c(10,100), lmbd=c(3,5), est=c("M","V"))
+  # sim %<>% set_config(num_sim=2)
+  sim %<>% set_config(num_sim=2, batch_levels=c("n", "lmbd"))
+  sim %<>% set_script(function() {
+    # dat <- create_data(L$n, L$lmbd)
+    batch({
+      dat <- create_data(L$n, L$lmbd)
+    })
+    lambda_hat <- est_mean(dat=dat, type=L$est)
+    return (list(
+      "lambda_hat" = lambda_hat,
+      "mean" = mean(dat),
+      ".complex" = list(a=1, m=mean(dat))
+    ))
+  })
+
+  sim %<>% run()
+  sim$results
+  # sim$results %>% arrange(batch_id)
+
+}
+
+# New progress bar
+if (F) {
+
+  # Example from stack overflow
+  n=1000
+  df=data.frame(time=1:n,y=runif(n))
+  window=100
+  for(i in 1:(n-window)) {
+    flush.console()
+    plot(df$time,df$y,type='l',xlim=c(i,i+window))
+    Sys.sleep(.09)
+  }
+
+  replaceMessage <- function(x, width = 80) {
+    message("\r", rep(" ", times = width - length(x)), "\r", appendLF = F)
+    message(x, appendLF = F)
+  }
+
+  replaceMessage("Saving...\nSaving..."); Sys.sleep(1); replaceMessage("Saved\nSaved");
+
+  #      |########################################| 100%
+
+  for (i in 12:8) {
+    message(paste0(i), "\r", appendLF=F)
+    # message(paste0(i,"\n",i), "\r", appendLF=F)
+    # message("\r", i, "\r")
+    # flush.console()
+    Sys.sleep(1)
+  }
+  #
+
+
+
+  .finished <- F
+  .count <- 1
+  while (!.finished) {
+
+    Sys.sleep(1)
+    .count <- .count + 1
+    if (.count>5) { .finished <- T }
+
+  }
+
+
+  for (i in 1:3) {
+    cat(paste0(
+      "Core 01: ", 123, "\n",
+      "Core 02: ", 456, "\n",
+      "Core 03: ", 789, "\n"
+    ), "\r")
+    flush.console()
+    Sys.sleep(1)
+  }
+
+  for (i in 1:3) {
+    cat(paste0(i,"\n"), " \r")
+    cat(paste0(i,"\n"), " \r")
+    # flush.console()
+    Sys.sleep(1)
+  }
+
+
+
+}
+
 # Scratch
 if (F) {
 
@@ -100,22 +301,6 @@ if (F) {
 
 }
 
-# Working on system for restricted level sets
-if (F) {
-
-  library(SimEngine)
-  sim <- new_sim()
-  sim %<>% set_config(num_sim=2)
-  sim %<>% set_levels(
-    n = c(100,400),
-    method = list(
-      "mth 1" = list(est="kernel", bnd=0.1),
-      "mth 2" = list(est="lasso", bnd=0.2)
-    )
-  )
-
-}
-
 # Fixing summarize() naming issues
 if (F) {
 
@@ -159,40 +344,4 @@ if (F) {
   # delete existing streams
   .lec.DeleteStream(stream.names)
 
-}
-
-# Github issue #27
-# Need a system to allow multiple methods to be executed on a single dataset
-# !!!!! Deprioritizing this for now
-if (F) {
-  sim <- new_sim()
-  create_data <- function(n, shape, rate) {
-    return(rgamma(n, shape, rate))
-  }
-  kde_estimator <- function(kernel, bandwidth) { ... }
-  sim %<>% set_levels(
-    "n" = c(20, 50),                        # creator param
-    "shape" = c(2, 4),                      # creator param
-    "rate" = c(3, 6),                       # creator param
-    "kernel" = c("gaussian", "triangular"), # other param
-    "bandwidth" = c(0.2, 0.8)               # other param
-  )
-  sim %<>% set_script(function() {
-    sim_seed("creator")
-    dat <- create_data(L$n, L$shape, L$rate)
-    sim_seed("other")
-    x <- rnorm(100)
-    kde <- kde_estimator(x, L$kernel, L$bandwidth) # placeholder
-    return (list("kde"=kde))
-  })
-  sim %<>% run()
-
-  # Current operation
-  sim %<>% set_config(datasets="many") # This gives normal operation
-  sim %<>% set_config(
-    datasets = "one",
-    creator_levels = c("n", "shape", "rate")
-  )
-
-  # * use uids for seeds? with multiplier?
 }

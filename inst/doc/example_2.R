@@ -68,14 +68,12 @@ sim %<>% run()
 
 ## -----------------------------------------------------------------------------
 summarized_results <- sim %>% summarize(
-  mean = list(
-    list(name="mean_se_beta0", x="beta0_se_est"),
-    list(name="mean_se_beta1", x="beta1_se_est")
-  ),
-  coverage = list(
-    list(name="cov_beta0", estimate="beta0_est", se="beta0_se_est", truth=-1),
-    list(name="cov_beta1", estimate="beta1_est", se="beta1_se_est", truth=10)
-  )
+  list(stat="mean", name="mean_se_beta0", x="beta0_se_est"),
+  list(stat="mean", name="mean_se_beta1", x="beta1_se_est"),
+  list(stat="coverage", name="cov_beta0", estimate="beta0_est",
+       se="beta0_se_est", truth=-1),
+  list(stat="coverage", name="cov_beta1", estimate="beta1_est",
+       se="beta1_se_est", truth=10)
 )
 
 print(summarized_results)
@@ -179,14 +177,12 @@ sim %<>% update_sim()
 
 ## ---- fig.width = 6-----------------------------------------------------------
 summarized_results <- sim %>% summarize(
-  mean = list(
-    list(name="mean_se_beta0", x="beta0_se_est"),
-    list(name="mean_se_beta1", x="beta1_se_est")
-  ),
-  coverage = list(
-    list(name="cov_beta0", estimate="beta0_est", se="beta0_se_est", truth=-1),
-    list(name="cov_beta1", estimate="beta1_est", se="beta1_se_est", truth=10)
-  )
+  list(stat="mean", name="mean_se_beta0", x="beta0_se_est"),
+  list(stat="mean", name="mean_se_beta1", x="beta1_se_est"),
+  list(stat="coverage", name="cov_beta0", estimate="beta0_est",
+       se="beta0_se_est", truth=-1),
+  list(stat="coverage", name="cov_beta1", estimate="beta1_est",
+       se="beta1_se_est", truth=10)
 )
 
 plot_results("width", 3)
