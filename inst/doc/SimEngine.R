@@ -72,7 +72,7 @@ sim %<>% set_script(function() {
 ## -----------------------------------------------------------------------------
 sim %<>% set_config(
   num_sim = 100,
-  parallel = "outer",
+  parallel = TRUE,
   n_cores = 2,
   packages = c("ggplot2", "stringr")
 )

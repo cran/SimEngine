@@ -56,7 +56,7 @@ if (F) {
       if (type=="V") { return(var(dat)) }
     }
     sim %<>% set_levels(n=c(10,100), est="M")
-    sim %<>% set_config(num_sim=5, n_cores=3, parallel="outer")
+    sim %<>% set_config(num_sim=5, n_cores=3, parallel=TRUE)
     sim %<>% set_script(function() {
       dat <- create_data(L$n)
       lambda_hat <- est_mean(dat=dat, type=L$est)
@@ -292,7 +292,7 @@ if (F) {
   sim %<>% set_config(
     num_sim = 1,
     seed = 24,
-    parallel = "none",
+    parallel = FALSE,
     n_cores = 2,
     packages = c("sandwich")
   )

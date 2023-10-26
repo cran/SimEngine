@@ -149,16 +149,15 @@ Sys.setenv(SLURM_ARRAY_TASK_ID="")
 Sys.setenv(sim_run="")
 
 # Test set #1
-run_and_test(which="01", parallel="none", n_cores=NA)
+run_and_test(which="01", parallel=FALSE, n_cores=NA)
 # run_and_test(which="02", parallel="outer", n_cores=NA) # Causes error, since this may call >2 cores
-run_and_test(which="03", parallel="outer", n_cores=1)
-run_and_test(which="04", parallel="outer", n_cores=2)
+run_and_test(which="03", parallel=TRUE, n_cores=1)
+run_and_test(which="04", parallel=TRUE, n_cores=2)
 # run_and_test(which="06", parallel="inner", n_cores=NA) # Causes error, since this may call >2 cores
-run_and_test(which="07", parallel="inner", n_cores=1)
-run_and_test(which="08", parallel="inner", n_cores=2)
+# run_and_test(which="07", parallel="inner", n_cores=1) # Inner parallelization deprecated
+# run_and_test(which="08", parallel="inner", n_cores=2) # Inner parallelization deprecated
 
 # Test set #2
-Sys.setenv(sim_run="")
 run_and_test_cl(which="09", cmplx=F, n_cores=NA)
 run_and_test_cl(which="10", cmplx=F, n_cores=1)
 run_and_test_cl(which="11", cmplx=F, n_cores=2)
@@ -197,11 +196,11 @@ for (j in c(2,3,6)) {
 # Test set #5
 Sys.setenv(sim_run="first")
 Sys.setenv(SLURM_ARRAY_TASK_ID="")
-run_and_test_cl(which="", cmplx=F, n_cores=2, run_tests=F, err=T)
+sim <- run_and_test_cl(which="", cmplx=F, n_cores=2, run_tests=F, ret=T, err=T)
 Sys.setenv(sim_run="main")
 for (i in c(1:2)) {
   Sys.setenv(SLURM_ARRAY_TASK_ID=as.character(i))
-  run_and_test_cl(which="", cmplx=F, n_cores=2, run_tests=F, err=T)
+  sim <- run_and_test_cl(which="", cmplx=F, n_cores=2, run_tests=F, ret=T, err=T)
 }
 test_that("Errors handled correctly:", {
   expect_equal(file.exists("sim_results/r_01.rds"), TRUE)
@@ -244,12 +243,12 @@ test_that("Error handling: tid>num_batches", {
 # Test set #8
 Sys.setenv(sim_run="first")
 Sys.setenv(SLURM_ARRAY_TASK_ID="")
-run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F)
+sim <- run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F, ret=T)
 Sys.setenv(sim_run="main")
 Sys.setenv(SLURM_ARRAY_TASK_ID="1")
-run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F)
+sim <- run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F, ret=T)
 Sys.setenv(SLURM_ARRAY_TASK_ID="2")
-run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F)
+sim <- run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F, ret=T)
 Sys.setenv(sim_run="last")
 Sys.setenv(SLURM_ARRAY_TASK_ID="")
 sim <- run_and_test_cl(which="", cmplx=F, n_cores=NA, run_tests=F, ret=T)

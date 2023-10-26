@@ -343,10 +343,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>This vignette is adapted from the
 <a href="https://avi-kenny.github.io/SimEngine/">homepage</a> of the
 SimEngine website.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimEngine)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loading required package: magrittr</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Welcome to SimEngine! Full package documentation can be found at:</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  https://avi-kenny.github.io/SimEngine</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(SimEngine)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; Loading required package: magrittr</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt; Welcome to SimEngine! Full package documentation can be found at:</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt;  https://avi-kenny.github.io/SimEngine</span></span></code></pre></div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <p><strong>SimEngine</strong> is an open-source R package for
@@ -368,8 +368,8 @@ controlled trial (RCT).</p>
 <h3>1) Load the package and create a “simulation object”</h3>
 <p>The simulation object (an R object of class <em>sim_obj</em>) will
 contain all data, functions, and results related to your simulation.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimEngine)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(SimEngine)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span></code></pre></div>
 </div>
 <div id="code-a-function-to-generate-some-data" class="section level3">
 <h3>2) Code a function to generate some data</h3>
@@ -380,31 +380,31 @@ continuous outcome (e.g. blood pressure) between a treatment group and a
 control group. We generate the data by looping through a set of
 patients, assigning them randomly to one of the two groups, and
 generating their outcome according to a simple model.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code up the dataset-generating function</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>create_rct_data <span class="ot">&lt;-</span> <span class="cf">function</span> (num_patients) {</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;patient_id&quot;</span> <span class="ot">=</span> <span class="fu">integer</span>(),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;group&quot;</span> <span class="ot">=</span> <span class="fu">character</span>(),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">double</span>(),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_patients) {</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">size=</span><span class="dv">1</span>)<span class="sc">==</span><span class="dv">1</span>, <span class="st">&quot;treatment&quot;</span>, <span class="st">&quot;control&quot;</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    treatment_effect <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="dv">0</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    outcome <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">mean=</span><span class="dv">130</span>, <span class="at">sd=</span><span class="dv">2</span>) <span class="sc">+</span> treatment_effect</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    df[i,] <span class="ot">&lt;-</span> <span class="fu">list</span>(i, group, outcome)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (df)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the function</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">create_rct_data</span>(<span class="dv">5</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   patient_id     group  outcome</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1          1   control 129.8751</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2          2 treatment 119.3603</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3          3 treatment 121.1414</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4          4   control 128.4800</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5          5   control 128.5542</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Code up the dataset-generating function</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>create_rct_data <span class="ot">&lt;-</span> <span class="cf">function</span> (num_patients) {</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    <span class="st">&quot;patient_id&quot;</span> <span class="ot">=</span> <span class="fu">integer</span>(),</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>    <span class="st">&quot;group&quot;</span> <span class="ot">=</span> <span class="fu">character</span>(),</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>    <span class="st">&quot;outcome&quot;</span> <span class="ot">=</span> <span class="fu">double</span>(),</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  )</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_patients) {</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">size=</span><span class="dv">1</span>)<span class="sc">==</span><span class="dv">1</span>, <span class="st">&quot;treatment&quot;</span>, <span class="st">&quot;control&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    treatment_effect <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="dv">0</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>    outcome <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">mean=</span><span class="dv">130</span>, <span class="at">sd=</span><span class="dv">2</span>) <span class="sc">+</span> treatment_effect</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>    df[i,] <span class="ot">&lt;-</span> <span class="fu">list</span>(i, group, outcome)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  }</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="fu">return</span> (df)</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>}</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co"># Test the function</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="fu">create_rct_data</span>(<span class="dv">5</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;   patient_id     group  outcome</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; 1          1 treatment 119.8892</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; 2          2   control 128.1227</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; 3          3   control 131.0566</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; 4          4   control 130.5807</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; 5          5 treatment 122.3775</span></span></code></pre></div>
 </div>
 <div id="code-your-methods-or-other-functions" class="section level3">
 <h3>3) Code your methods (or other functions)</h3>
@@ -421,26 +421,26 @@ too much about the mathematical details; the important thing is that
 both methods attempt to take in the dataset generated by the
 <code>create_rct_data</code> function and return an estimate of the
 treatment effect, which in this case is <em>-7</em>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code up the estimators</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>est_tx_effect <span class="ot">&lt;-</span> <span class="cf">function</span>(df, type) {</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(df)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  sum_t <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>outcome <span class="sc">*</span> (df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  sum_c <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>outcome <span class="sc">*</span> (df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;control&quot;</span>))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est1&quot;</span>) {</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    true_prob <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ( sum_t<span class="sc">/</span>(n<span class="sc">*</span>true_prob) <span class="sc">-</span> sum_c<span class="sc">/</span>(n<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>true_prob)) )</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est2&quot;</span>) {</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    est_prob <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>) <span class="sc">/</span> n</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ( sum_t<span class="sc">/</span>(n<span class="sc">*</span>est_prob) <span class="sc">-</span> sum_c<span class="sc">/</span>(n<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>est_prob)) )</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Test out the estimators</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">create_rct_data</span>(<span class="dv">1000</span>)</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">est_tx_effect</span>(df, <span class="st">&quot;est1&quot;</span>)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -2.433254</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">est_tx_effect</span>(df, <span class="st">&quot;est2&quot;</span>)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -6.990429</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Code up the estimators</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>est_tx_effect <span class="ot">&lt;-</span> <span class="cf">function</span>(df, type) {</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(df)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  sum_t <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>outcome <span class="sc">*</span> (df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  sum_c <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>outcome <span class="sc">*</span> (df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;control&quot;</span>))</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est1&quot;</span>) {</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>    true_prob <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="fu">return</span> ( sum_t<span class="sc">/</span>(n<span class="sc">*</span>true_prob) <span class="sc">-</span> sum_c<span class="sc">/</span>(n<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>true_prob)) )</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est2&quot;</span>) {</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    est_prob <span class="ot">&lt;-</span> <span class="fu">sum</span>(df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>) <span class="sc">/</span> n</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    <span class="fu">return</span> ( sum_t<span class="sc">/</span>(n<span class="sc">*</span>est_prob) <span class="sc">-</span> sum_c<span class="sc">/</span>(n<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>est_prob)) )</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  }</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>}</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co"># Test out the estimators</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">create_rct_data</span>(<span class="dv">1000</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="fu">est_tx_effect</span>(df, <span class="st">&quot;est1&quot;</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; [1] -15.66783</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">est_tx_effect</span>(df, <span class="st">&quot;est2&quot;</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; [1] -7.063783</span></span></code></pre></div>
 </div>
 <div id="set-the-simulation-levels" class="section level3">
 <h3>4) Set the simulation levels</h3>
@@ -458,10 +458,10 @@ Note that we make extensive use of the pipe operators
 <strong>magrittr</strong> package; if you have never used pipes, check
 out the <a href="https://magrittr.tidyverse.org">magrittr
 documentation</a>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="fu">c</span>(<span class="st">&quot;est1&quot;</span>, <span class="st">&quot;est2&quot;</span>),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_patients =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">200</span>, <span class="dv">1000</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="fu">c</span>(<span class="st">&quot;est1&quot;</span>, <span class="st">&quot;est2&quot;</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">num_patients =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">200</span>, <span class="dv">1000</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="create-a-simulation-script" class="section level3">
 <h3>5) Create a simulation script</h3>
@@ -474,15 +474,15 @@ example, when the first simulation replicate is running,
 replicate, <code>L$estimator</code> will equal “est2” and
 <code>L$num_patients</code> will equal 1,000. Your script will
 automatically have access to any functions that you created earlier.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">create_rct_data</span>(L<span class="sc">$</span>num_patients)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  est <span class="ot">&lt;-</span> <span class="fu">est_tx_effect</span>(df, L<span class="sc">$</span>estimator)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="fu">list</span>(</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;est&quot;</span> <span class="ot">=</span> est,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;mean_t&quot;</span> <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>outcome[df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>]),</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;mean_c&quot;</span> <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>outcome[df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;control&quot;</span>])</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">create_rct_data</span>(L<span class="sc">$</span>num_patients)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  est <span class="ot">&lt;-</span> <span class="fu">est_tx_effect</span>(df, L<span class="sc">$</span>estimator)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="fu">return</span> (<span class="fu">list</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="st">&quot;est&quot;</span> <span class="ot">=</span> est,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="st">&quot;mean_t&quot;</span> <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>outcome[df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;treatment&quot;</span>]),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="st">&quot;mean_c&quot;</span> <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>outcome[df<span class="sc">$</span>group<span class="sc">==</span><span class="st">&quot;control&quot;</span>])</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  ))</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>})</span></code></pre></div>
 <p>Your script should always return a list containing key-value pairs,
 where the keys are character strings and the values are simple data
 types (numbers, character strings, or boolean values). If you need to
@@ -507,60 +507,60 @@ simulation needs (instead of using <code>library</code> or
 docs for more info. We set <code>num_sim</code> to 100, and so
 <strong>SimEngine</strong> will run a total of 600 simulation replicates
 (100 for each of the six level combinations).</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_sim =</span> <span class="dv">100</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="st">&quot;outer&quot;</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">2</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">packages =</span> <span class="fu">c</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;stringr&quot;</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;ggplot2&#39;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:SimEngine&#39;:</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     vars</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">num_sim =</span> <span class="dv">100</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">2</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">packages =</span> <span class="fu">c</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;stringr&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;ggplot2&#39;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:SimEngine&#39;:</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt;     vars</span></span></code></pre></div>
 </div>
 <div id="run-the-simulation" class="section level3">
 <h3>7) Run the simulation</h3>
 <p>All 600 replicates are run at once and results are stored in the
 simulation object.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
 </div>
 <div id="view-and-summarize-results" class="section level3">
 <h3>8) View and summarize results</h3>
 <p>Once the simulations have finished, use the <code>summarize</code>
 function to calculate common summary statistics, such as bias, variance,
 MSE, and coverage.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;bias&quot;</span>, <span class="at">truth=</span><span class="sc">-</span><span class="dv">7</span>, <span class="at">estimate=</span><span class="st">&quot;est&quot;</span>),</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;mse&quot;</span>, <span class="at">truth=</span><span class="sc">-</span><span class="dv">7</span>, <span class="at">estimate=</span><span class="st">&quot;est&quot;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   level_id estimator num_patients n_reps    bias_est      MSE_est</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        1      est1           50    100 -0.13225169 1.404444e+03</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        2      est2           50    100 -0.04259171 3.477538e-01</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3        3      est1          200    100  0.78573210 2.899590e+02</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4        4      est2          200    100 -0.01786233 7.998046e-02</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5        5      est1         1000    100  0.67452824 8.032309e+01</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6        6      est2         1000    100 -0.01418204 1.840193e-02</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;bias&quot;</span>, <span class="at">truth=</span><span class="sc">-</span><span class="dv">7</span>, <span class="at">estimate=</span><span class="st">&quot;est&quot;</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;mse&quot;</span>, <span class="at">truth=</span><span class="sc">-</span><span class="dv">7</span>, <span class="at">estimate=</span><span class="st">&quot;est&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;   level_id estimator num_patients n_reps     bias_est      MSE_est</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; 1        1      est1           50    100  1.159739195 1.167700e+03</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; 2        2      est2           50    100  0.102151883 3.112068e-01</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; 3        3      est1          200    100  3.332611940 3.066223e+02</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; 4        4      est2          200    100 -0.049515894 7.599178e-02</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; 5        5      est1         1000    100  1.623324819 6.396039e+01</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; 6        6      est2         1000    100 -0.000810299 1.421038e-02</span></span></code></pre></div>
 <p>In this example, we see that the MSE of estimator 1 is much higher
 than that of estimator 2 and that MSE decreases with increasing sample
 size for both estimators, as expected. You can also directly access the
 results for individual simulation replicates.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sim<span class="sc">$</span>results)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id estimator num_patients     runtime       est   mean_t</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       1        1      1      est1           50 0.017238855 -7.024414 123.1545</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       7        1      2      est1           50 0.008081913 33.498487 123.1136</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       8        1      3      est1           50 0.017217875 53.223286 122.7834</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       9        1      4      est1           50 0.008183002 13.243025 122.6842</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      10        1      5      est1           50 0.008656025 -7.360314 122.9676</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      11        1      6      est1           50 0.005247116 34.665100 123.4964</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     mean_c</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 130.1789</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 130.1348</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 130.3001</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 129.6260</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 130.3279</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 129.2747</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">head</span>(sim<span class="sc">$</span>results)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id estimator num_patients     runtime        est</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; 1       1        1      1      est1           50 0.006202936 -17.028056</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; 2       7        1      2      est1           50 0.004877090  22.921537</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; 3       8        1      3      est1           50 0.006031990  -7.062596</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; 4       9        1      4      est1           50 0.005043983 -26.944357</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; 5      10        1      5      est1           50 0.007095098  23.259374</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 6      11        1      6      est1           50 0.004637957  -7.814285</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt;     mean_t   mean_c</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 1 123.4479 130.3251</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 2 122.5447 129.9188</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 3 122.6812 129.7438</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 4 122.7984 129.5545</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; 5 123.1836 130.3480</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; 6 122.8533 130.6675</span></span></code></pre></div>
 <p>Above, the <code>sim_uid</code> uniquely identifies a single
 simulation replicate and the <code>level_id</code> uniquely identifies a
 level combination. The rep_id is unique within a given level combination
