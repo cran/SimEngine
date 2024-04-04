@@ -1,28 +1,32 @@
 #' Summarize simulation results
 #'
-#' @description This function calculates summary statistics for simulation results,
-#'     including descriptive statistics (e.g. measures of
-#'     center or spread) and inferential statistics (e.g. bias or confidence interval
-#'     coverage). All summary statistics are calculated over simulation replicates
-#'     within a single simulation level.
+#' @description This function calculates summary statistics for simulation
+#'     results, including descriptive statistics (e.g. measures of center or
+#'     spread) and inferential statistics (e.g. bias or confidence interval
+#'     coverage). All summary statistics are calculated over simulation
+#'     replicates within a single simulation level.
 #' @param sim A simulation object of class \code{sim_obj}, usually created by
 #'     \code{\link{new_sim}}
-#' @param mc_se A logical argument indicating whether to compute Monte Carlo standard error and associated confidence interval
-#'     for inferential summary statistics.  This applies only to the \code{bias}, \code{bias_pct}, \code{mse}, \code{mae},
-#'     and \code{coverage} summary statistics.
-#' @param ... One or more lists, separated by commas, specifying desired summaries of the \code{sim}
-#'     simulation object. See examples. Each list must have a \code{stat} item, which specifies the type of summary statistic to
-#'     be calculated. The \code{na.rm} item indicates whether to exclude \code{NA} values when performing the calculation (with
-#'     default being \code{FALSE}). For \code{stat} options where the \code{name} item is optional,
-#'     if it is not provided, a name will be formed from the type of summary and the column on which the summary
-#'     is performed. Additional required items are detailed below for each \code{stat} type.
+#' @param mc_se A logical argument indicating whether to compute Monte Carlo
+#'     standard error and associated confidence interval for inferential summary
+#'     statistics.  This applies only to the \code{bias}, \code{bias_pct},
+#'     \code{mse}, \code{mae}, and \code{coverage} summary statistics.
+#' @param ... One or more lists, separated by commas, specifying desired
+#'     summaries of the \code{sim} simulation object. See examples. Each list
+#'     must have a \code{stat} item, which specifies the type of summary
+#'     statistic to be calculated. The \code{na.rm} item indicates whether to
+#'     exclude \code{NA} values when performing the calculation (with default
+#'     being \code{FALSE}). For \code{stat} options where the \code{name} item
+#'     is optional, if it is not provided, a name will be formed from the type
+#'     of summary and the column on which the summary is performed. Additional
+#'     required items are detailed below for each \code{stat} type.
 #'     \itemize{
 #'
-#'     \item{\code{list(stat="mean", x="col_1", name="mean_col")} computes the
-#'     mean of column \code{sim$results$col_1} for each level combination and
-#'     creates a summary column named \code{"mean_col"}. Other single-column
-#'     summary statistics (see the next few items) work analogously. \code{name}
-#'     is optional.}
+#'     \item{\code{list(stat="mean", x="col_1", name="mean_col", na.rm=F)}
+#'     computes the mean of column \code{sim$results$col_1} for each level
+#'     combination and creates a summary column named \code{"mean_col"}. Other
+#'     single-column summary statistics (see the next few items) work
+#'     analogously. \code{name} is optional.}
 #'
 #'     \item{\code{list(stat="median", ...)} computes the median.}
 #'
@@ -95,25 +99,27 @@
 #'    }
 #' @details \itemize{
 #'
-#'     \item{For all inferential summaries there are three ways to specify \code{truth}: (1) a single number,
-#'     meaning the estimand is the same across all simulation replicates and levels, (2) a numeric vector of the
-#'     same length as the number of rows in \code{sim$results}, or (3) the name of a variable in \code{sim$results}
-#'     containing the estimand of interest.}
+#'     \item{For all inferential summaries there are three ways to specify
+#'     \code{truth}: (1) a single number, meaning the estimand is the same
+#'     across all simulation replicates and levels, (2) a numeric vector of the
+#'     same length as the number of rows in \code{sim$results}, or (3) the name
+#'     of a variable in \code{sim$results} containing the estimand of interest.}
 #'
-#'     \item{There are two ways to specify the confidence interval bounds for \code{coverage}. The first is to provide
-#'     an \code{estimate} and its associated \code{se} (standard error). These should both be variables in
-#'     \code{sim$results}. The function constructs a 95\% Wald-type confidence interval of the form
-#'     \code{(estimate-1.96*se, estimate+1.96*se)}. The alternative is to provide
-#'     \code{lower} and \code{upper} bounds, which should also be variables in \code{sim$results}. In this case,
-#'     the confidence interval is (\code{lower}, \code{upper}). The coverage is the proportion of simulation
-#'     replicates for a given level combination in which \code{truth} lies within the interval.}
+#'     \item{There are two ways to specify the confidence interval bounds for
+#'     \code{coverage}. The first is to provide an \code{estimate} and its
+#'     associated \code{se} (standard error). These should both be variables in
+#'     \code{sim$results}. The function constructs a 95\% Wald-type confidence
+#'     interval of the form \code{(estimate-1.96*se, estimate+1.96*se)}. The
+#'     alternative is to provide \code{lower} and \code{upper} bounds, which
+#'     should also be variables in \code{sim$results}. In this case, the
+#'     confidence interval is (\code{lower}, \code{upper}). The coverage is the
+#'     proportion of simulation replicates for a given level combination in
+#'     which \code{truth} lies within the interval.}
 #' }
-#' @return A data frame containing the result of each specified summary function as a column, for each of
-#'     the simulation levels. The column \code{n_reps} returns the number of successful simulation replicates
-#'     within each level.
+#' @return A data frame containing the result of each specified summary function
+#'     as a column, for each of the simulation levels. The column \code{n_reps}
+#'     returns the number of successful simulation replicates within each level.
 #' @examples
-#' # The following is a toy example of a simulation, illustrating the use of
-#' # the summarize function.
 #' sim <- new_sim()
 #' create_data <- function(n) { rpois(n, lambda=5) }
 #' est_mean <- function(dat, type) {
@@ -377,7 +383,9 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
     } else if (stat_name == "quantile"){
 
       # if name missing, create a name
-      if (is.null(arg$name)) { arg$name <- paste0("quantile_", arg$prob, "_", arg$x) }
+      if (is.null(arg$name)) {
+        arg$name <- paste0("quantile_", arg$prob, "_", arg$x)
+      }
 
       # Handle errors
       handle_errors(arg$x, "is.null", msg="`x` argument is required")
@@ -399,8 +407,8 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
 
       code_quantile <- c(code_quantile, paste0(
         #arg$name, " = quantile(", arg$x, ", probs=", arg$prob, ",", na_1
-        pre, arg$name, " = tryCatch(quantile(", arg$x, ", probs=", arg$prob, ",",
-        na_1, " error = function(e) {return(NA)}),"
+        pre, arg$name, " = tryCatch(quantile(", arg$x, ", probs=", arg$prob,
+        ",", na_1, " error = function(e) {return(NA)}),"
       ))
 
       # parse min summary code
@@ -456,16 +464,19 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       if (is.null(arg$name)) { arg$name <- paste0("bias_", arg$estimate) }
 
       # Handle errors
-      handle_errors(arg$estimate, "is.null", msg="`estimate` argument is required")
+      handle_errors(arg$estimate, "is.null",
+                    msg="`estimate` argument is required")
       handle_errors(arg$truth, "is.null", msg="`truth` argument is required")
       handle_errors(arg$name, "is.character", name="name")
       handle_errors(arg$estimate, "is.in", other=names(R),
-                    msg=paste0("`",arg$estimate,"` is not a variable in results"))
+                    msg=paste0("`",arg$estimate,
+                               "` is not a variable in results"))
       handle_errors(R[[arg$estimate]], "is.numeric.vec", name=arg$estimate)
       if (length(arg$truth)>1 ||
           (!is.numeric(arg$truth) && !(arg$truth %in% names(R))) ||
           (arg$truth %in% names(R) && !is.numeric(R[[arg$truth]]))) {
-        stop(paste0("`", arg$truth, "` is neither a number nor a variable in results"))
+        stop(paste0("`", arg$truth,
+                    "` is neither a number nor a variable in results"))
       }
 
       if (!is.null(arg$na.rm) && arg$na.rm==TRUE) {
@@ -485,14 +496,17 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
           na_1 <- ")"
         }
         code_bias_mc_se <- c(code_bias_mc_se, paste0(
-          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,"))-1))*mean((",
+          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,
+          "))-1))*mean((",
           arg$estimate, "-", arg$truth, "-", pre, arg$name, ")^2", na_1, "),"
         ))
         code_bias_mc_cil <- c(code_bias_mc_cil, paste0(
-          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
         code_bias_mc_ciu <- c(code_bias_mc_ciu, paste0(
-          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
       }
 
@@ -503,16 +517,19 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       if (is.null(arg$name)) { arg$name <- paste0("bias_pct_", arg$estimate) }
 
       # Handle errors
-      handle_errors(arg$estimate, "is.null",msg="`estimate` argument is required")
+      handle_errors(arg$estimate, "is.null",
+                    msg="`estimate` argument is required")
       handle_errors(arg$truth, "is.null", msg="`truth` argument is required")
       handle_errors(arg$name, "is.character", name="name")
       handle_errors(arg$estimate, "is.in", other=names(R),
-                    msg=paste0("`",arg$estimate,"` is not a variable in results"))
+                    msg=paste0("`",arg$estimate,
+                               "` is not a variable in results"))
       handle_errors(R[[arg$estimate]], "is.numeric.vec", name=arg$estimate)
       if (length(arg$truth)>1 ||
           (!is.numeric(arg$truth) && !(arg$truth %in% names(R))) ||
           (arg$truth %in% names(R) && !is.numeric(R[[arg$truth]]))) {
-        stop(paste0("`", arg$truth, "` is neither a number nor a variable in results"))
+        stop(paste0("`", arg$truth,
+                    "` is neither a number nor a variable in results"))
       }
 
       if (!is.null(arg$na.rm) && arg$na.rm==TRUE) {
@@ -538,10 +555,12 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
           arg$estimate, "-", arg$truth, "-", pre, arg$name, ")^2", na_1, "),"
         ))
         code_bias_pct_mc_cil <- c(code_bias_pct_mc_cil, paste0(
-          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
         code_bias_pct_mc_ciu <- c(code_bias_pct_mc_ciu, paste0(
-          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
       }
 
@@ -552,16 +571,19 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       if (is.null(arg$name)) { arg$name <- paste0("MSE_", arg$estimate) }
 
       # Handle errors
-      handle_errors(arg$estimate, "is.null", msg="`estimate` argument is required")
+      handle_errors(arg$estimate, "is.null",
+                    msg="`estimate` argument is required")
       handle_errors(arg$truth, "is.null", msg="`truth` argument is required")
       handle_errors(arg$name, "is.character", name="name")
       handle_errors(arg$estimate, "is.in", other=names(R),
-                    msg=paste0("`",arg$estimate,"` is not a variable in results"))
+                    msg=paste0("`",arg$estimate,
+                               "` is not a variable in results"))
       handle_errors(R[[arg$estimate]], "is.numeric.vec", name=arg$estimate)
       if (length(arg$truth)>1 ||
           (!is.numeric(arg$truth) && !(arg$truth %in% names(R))) ||
           (arg$truth %in% names(R) && !is.numeric(R[[arg$truth]]))) {
-        stop(paste0("`", arg$truth, "` is neither a number nor a variable in results"))
+        stop(paste0("`", arg$truth,
+                    "` is neither a number nor a variable in results"))
       }
 
       if (!is.null(arg$na.rm) && arg$na.rm==TRUE) {
@@ -581,14 +603,18 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
           na_1 <- ")"
         }
         code_mse_mc_se <- c(code_mse_mc_se, paste0(
-          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,"))-1))*mean(((",
-          arg$estimate, "-", arg$truth, ")^2 -", pre, arg$name, ")^2", na_1, "),"
+          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,
+          "))-1))*mean(((",
+          arg$estimate, "-", arg$truth, ")^2 -", pre, arg$name, ")^2", na_1,
+          "),"
         ))
         code_mse_mc_cil <- c(code_mse_mc_cil, paste0(
-          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
         code_mse_mc_ciu <- c(code_mse_mc_ciu, paste0(
-          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
       }
 
@@ -599,16 +625,19 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       if (is.null(arg$name)) { arg$name <- paste0("MAE_", arg$estimate) }
 
       # Handle errors
-      handle_errors(arg$estimate, "is.null", msg="`estimate` argument is required")
+      handle_errors(arg$estimate, "is.null",
+                    msg="`estimate` argument is required")
       handle_errors(arg$truth, "is.null", msg="`truth` argument is required")
       handle_errors(arg$name, "is.character", name="name")
       handle_errors(arg$estimate, "is.in", other=names(R),
-                    msg=paste0("`",arg$estimate,"` is not a variable in results"))
+                    msg=paste0("`",arg$estimate,
+                               "` is not a variable in results"))
       handle_errors(R[[arg$estimate]], "is.numeric.vec", name=arg$estimate)
       if (length(arg$truth)>1 ||
           (!is.numeric(arg$truth) && !(arg$truth %in% names(R))) ||
           (arg$truth %in% names(R) && !is.numeric(R[[arg$truth]]))) {
-        stop(paste0("`", arg$truth, "` is neither a number nor a variable in results"))
+        stop(paste0("`", arg$truth,
+                    "` is neither a number nor a variable in results"))
       }
 
       if (!is.null(arg$na.rm) && arg$na.rm==TRUE) {
@@ -628,14 +657,17 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
           na_1 <- ")"
         }
         code_mae_mc_se <- c(code_mae_mc_se, paste0(
-          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,"))-1))*mean((abs(",
-          arg$estimate, "-", arg$truth, ") -", pre, arg$name, ")^2", na_1, "),"
+          pre, arg$name, "_mc_se = sqrt((1/(sum(!is.na(", arg$estimate,
+          "))-1))*mean((abs(", arg$estimate, "-", arg$truth, ") -", pre,
+          arg$name, ")^2", na_1, "),"
         ))
         code_mae_mc_cil <- c(code_mae_mc_cil, paste0(
-          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_l = ", pre, arg$name, "- 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
         code_mae_mc_ciu <- c(code_mae_mc_ciu, paste0(
-          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name, "_mc_se,"
+          pre, arg$name, "_mc_ci_u = ", pre, arg$name, "+ 1.96*", pre, arg$name,
+          "_mc_se,"
         ))
       }
 
@@ -650,17 +682,20 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       if (length(arg$truth)>1 ||
           (!is.numeric(arg$truth) && !(arg$truth %in% names(R))) ||
           (arg$truth %in% names(R) && !is.numeric(R[[arg$truth]]))) {
-        stop(paste0("`", arg$truth, "` is neither a number nor a variable in results"))
+        stop(paste0("`", arg$truth,
+                    "` is neither a number nor a variable in results"))
       }
       if (!((!is.null(arg$est) && !is.null(arg$se)) ||
             (!is.null(arg$lower) && !is.null(arg$upper)))) {
-        stop("Either `estimate` and `se` OR `lower` and `upper` must be provided")
+        stop(paste0("Either `estimate` and `se` OR `lower` and `upper` must be",
+                    " provided"))
       }
 
       # Handle case where user provides estimate+se
       if (!is.null(arg$se) && !is.null(arg$estimate)) {
         handle_errors(arg$estimate, "is.in", other=names(R),
-                      msg=paste0("`",arg$estimate,"` is not a variable in results"))
+                      msg=paste0("`",arg$estimate,
+                                 "` is not a variable in results"))
         handle_errors(arg$se, "is.in", other=names(R),
                       msg=paste0("`",arg$se,"` is not a variable in results"))
         handle_errors(R[[arg$estimate]], "is.numeric.vec", name=arg$estimate)
@@ -672,9 +707,11 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
       # Handle case where user provides lower+upper
       if (!is.null(arg$lower) && !is.null(arg$upper)) {
         handle_errors(arg$lower, "is.in", other=names(R),
-                      msg=paste0("`",arg$lower,"` is not a variable in results"))
+                      msg=paste0("`",arg$lower,
+                                 "` is not a variable in results"))
         handle_errors(arg$upper, "is.in", other=names(R),
-                      msg=paste0("`",arg$upper,"` is not a variable in results"))
+                      msg=paste0("`",arg$upper,
+                                 "` is not a variable in results"))
         handle_errors(R[[arg$lower]], "is.numeric.vec", name=arg$lower)
         handle_errors(R[[arg$upper]], "is.numeric.vec", name=arg$upper)
         ci_l <- R[[arg$lower]]
@@ -703,18 +740,19 @@ summarize.sim_obj <- function(sim, ..., mc_se = FALSE) {
           na_1 <- ")"
         }
 
-        na_code <- paste0("sum(!is.na(.ci_l_", arg$name, ") & !is.na(.ci_h_", arg$name,
-        ") & !is.na(", arg$truth, ")", ")")
+        na_code <- paste0("sum(!is.na(.ci_l_", arg$name, ") & !is.na(.ci_h_",
+                          arg$name, ") & !is.na(", arg$truth, ")", ")")
         code_coverage_mc_se <- c(code_coverage_mc_se, paste0(
-          pre, arg$name, "_mc_se = sqrt((1/", na_code, ")*", pre, arg$name, "* (1 - ",
-          pre, arg$name, ")),"
+          pre, arg$name, "_mc_se = sqrt((1/", na_code, ")*", pre, arg$name,
+          "* (1 - ", pre, arg$name, ")),"
         ))
         code_coverage_mc_cil <- c(code_coverage_mc_cil, paste0(
-          pre, arg$name, "_mc_ci_l = max(", pre, arg$name, "- 1.96*", pre, arg$name, "_mc_se, 0),"
-
+          pre, arg$name, "_mc_ci_l = max(", pre, arg$name, "- 1.96*", pre,
+          arg$name, "_mc_se, 0),"
         ))
         code_coverage_mc_ciu <- c(code_coverage_mc_ciu, paste0(
-          pre, arg$name, "_mc_ci_u = min(", pre, arg$name, "+ 1.96*", pre, arg$name, "_mc_se, 1),"
+          pre, arg$name, "_mc_ci_u = min(", pre, arg$name, "+ 1.96*", pre,
+          arg$name, "_mc_se, 1),"
         ))
       }
 

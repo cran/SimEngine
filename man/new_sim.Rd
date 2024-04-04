@@ -11,13 +11,13 @@ A simulation object, of class \code{sim_obj}
 }
 \description{
 Create a new simulation object. This is typically the first
-    function to be called when running a simulation using \pkg{SimEngine}. Most
-    other \pkg{SimEngine} functions take a simulation object as their first
-    argument.
+    function to be called when running a simulation using \pkg{SimEngine}.
+    Most other \pkg{SimEngine} functions take a simulation object as their
+    first argument.
 }
 \examples{
 sim <- new_sim()
-sim
+print(sim)
 }
 \seealso{
 Visit \url{https://avi-kenny.github.io/SimEngine/} for more information on how to

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Parallelization</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Parallelization</h1>
+
+
+
+<div id="what-is-parallelization" class="section level2">
+<h2>What is parallelization?</h2>
+<p>Parallelization is the process of speeding up a computer program by
+dividing it into independent tasks and running those tasks
+simultaneously across multiple computer processors. Most modern laptops
+will have two or more processors (or “cores”), and many statisticians
+have access to so-called cluster computing systems (CCS), which can have
+hundreds of processing nodes, each of which can have multiple cores.
+Roughly speaking, a program that can be run in ten minutes when executed
+on a single core will take just one minute if it can be broken into ten
+separate tasks that all run at the same time. Therefore, parallelization
+can result in massive gains in computing speed and should be done
+whenever possible.</p>
+<p>Not all code can be parallelized; the separate tasks cannot exchange
+information or depend on each other in any way. However, you can still
+write programs that are <em>partially</em> parallel, such as when you
+separately compute ten estimates in parallel and then take the mean of
+the ten estimates.</p>
+<p>The terminology associated with parallel computing can be confusing -
+what is the difference between a node, a core, and a processor? What is
+the difference between a job, a task, and a thread? We use the following
+definitions:</p>
+<ul>
+<li>A <strong>node</strong> is a single computer. Each node has access
+to physical resources, such as processing cores and memory. Your laptop
+is a node. A CCS is a collection of multiple nodes.</li>
+<li>A <strong>core</strong> (or a <em>processor</em>) is an electronic
+component within a computer that executes code. Many modern laptops will
+have more than one core, and each node on a CCS will usually have
+multiple cores.</li>
+<li>A <strong>task</strong> (or a <em>thread</em>) is a portion of code
+that runs on a single core.</li>
+<li>A <strong>cluster computing system (CCS)</strong> is a type of
+“supercomputer”, usually created and managed by IT specialists,
+specifically designed to handle large numbers of parallel tasks coming
+from multiple users.</li>
+<li>A <strong>job</strong> is a collection of tasks that are part of the
+same simulation.</li>
+<li>A <strong>job array</strong> is a special type of job that contains
+a number of near-identical tasks</li>
+<li>A <strong>job scheduler (JS)</strong> is the software that runs on a
+CCS and manages the process of running jobs and job arrays. Slurm and
+Oracle Grid Engine are examples of job schedulers.</li>
+</ul>
+</div>
+<div id="parallelization-in-simengine" class="section level2">
+<h2>Parallelization in <strong>SimEngine</strong></h2>
+<p>User-friendly parallelization is a hallmark of
+<strong>SimEngine</strong>. There are two modes of parallelizing code
+using <strong>SimEngine</strong>, which we refer to as <em>local
+parallelization</em> and <em>cluster parallelization</em>. Local
+parallelization refers to splitting the computational work of a
+simulation between multiple cores of a single computer (e.g., a
+multicore laptop). Cluster parallelization refers to running a
+simulation on a CCS using job arrays. <strong>SimEngine</strong> is
+designed to automate as much of the parallelization process as possible.
+We give an overview of each parallelization mode below.</p>
+</div>
+<div id="local-parallelization" class="section level2">
+<h2>Local parallelization</h2>
+<p>Local parallelization is the easiest way to parallelize code, as the
+entire process is handled by the package and executed on the user’s
+computer. This mode is activated using <code>set_config()</code>, as
+follows.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">parallel =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><strong>SimEngine</strong> handles the mechanics related to
+parallelization internally using the base R package
+<code>parallel</code>. If a single simulation replicate runs in a very
+short amount of time (e.g., less than one second), using local
+parallelization can actually result in an <em>increase</em> in total
+runtime. This is because there is a certain amount of computational
+overhead involved in the parallelization mechanisms inside
+<strong>SimEngine</strong>. A speed comparison can be performed by
+running the code twice, once with
+<code>set_config(parallel = TRUE)</code> and once with
+<code>set_config(parallel = FALSE)</code>, each followed by
+<code>sim %&gt;% vars(&quot;total_runtime&quot;)</code>, to see the difference in
+total runtime. The exact overhead involved with local parallelization
+will differ between machines.</p>
+<p>If the user’s computer has <code>n</code> cores available,
+<strong>SimEngine</strong> will use <code>n-1</code> cores by default.
+The <code>n_cores</code> argument of <code>set_config()</code> can be
+used to manually specify the number of cores to use, as follows.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">n_cores =</span> <span class="dv">2</span>)</span></code></pre></div>
+</div>
+<div id="cluster-parallelization" class="section level2">
+<h2>Cluster parallelization</h2>
+<p>Parallelizing code using a CCS is more complicated, but
+<strong>SimEngine</strong> is built to streamline this process as much
+as possible. A CCS is a supercomputer that consists of a number of
+nodes, each of which may have multiple cores. In a typical workflow, a
+user starts by logging into the CCS (via SSH) and transferring files to
+the CCS filesystem (using Linux commands or an FTP client). The user
+then runs programs by submitting “jobs” to the CCS using a special
+program called a job scheduler. The job scheduler manages the process of
+running the jobs in parallel across multiple nodes and/or multiple
+cores. Although there are multiple ways to run code in parallel on a
+CCS, <strong>SimEngine</strong> makes use of job arrays. The main
+cluster parallelization function in <strong>SimEngine</strong> is
+<code>run_on_cluster()</code>. Throughout this example, we use Slurm as
+an example job scheduler, but an analogous workflow will apply to other
+job scheduling software.</p>
+<p>To illustrate the cluster parallelization workflow, consider the
+following simulation:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) { <span class="fu">return</span>(<span class="fu">rpois</span>(<span class="at">n=</span>n, <span class="at">lambda=</span><span class="dv">20</span>)) }</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>est_lambda <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, type) {</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;M&quot;</span>) { <span class="fu">return</span>(<span class="fu">mean</span>(dat)) }</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;V&quot;</span>) { <span class="fu">return</span>(<span class="fu">var</span>(dat)) }</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">estimator =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>,<span class="st">&quot;V&quot;</span>), <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">100</span>,<span class="dv">1000</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(L<span class="sc">$</span>n)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  lambda_hat <span class="ot">&lt;-</span> <span class="fu">est_lambda</span>(<span class="at">dat=</span>dat, <span class="at">type=</span>L<span class="sc">$</span>estimator)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="st">&quot;lambda_hat&quot;</span><span class="ot">=</span>lambda_hat))</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>})</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">100</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>()</span></code></pre></div>
+<p>To run this code on a CCS, we simply wrap it in the
+<code>run_on_cluster()</code> function. To use this function, we must
+break the code into three blocks, called <code>first</code>,
+<code>main</code>, and <code>last</code>. The code in the
+<code>first</code> block will run only once, and will set up the
+simulation object. When this is finished, <strong>SimEngine</strong>
+will save the simulation object in the filesystem of the CCS. The code
+in the <code>main</code> block will then run once for each simulation
+replicate, and will have access to the simulation object created in the
+<code>first</code> block. In most cases, the code in the
+<code>main</code> block will simply include a single call to
+<code>run()</code>. Finally, the code in the <code>last</code> block
+will run after all simulation replicates have finished running, and
+after <strong>SimEngine</strong> has automatically compiled the results
+into the simulation object. Use of the <code>run_on_cluster()</code>
+function is illustrated below:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">run_on_cluster</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">first =</span> {</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) { <span class="fu">return</span>(<span class="fu">rpois</span>(<span class="at">n=</span>n, <span class="at">lambda=</span><span class="dv">20</span>)) }</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    est_lambda <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, type) {</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>      <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;M&quot;</span>) { <span class="fu">return</span>(<span class="fu">mean</span>(dat)) }</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>      <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;V&quot;</span>) { <span class="fu">return</span>(<span class="fu">var</span>(dat)) }</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    }</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">estimator =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>,<span class="st">&quot;V&quot;</span>), <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">100</span>,<span class="dv">1000</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>      dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(L<span class="sc">$</span>n)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>      lambda_hat <span class="ot">&lt;-</span> <span class="fu">est_lambda</span>(<span class="at">dat=</span>dat, <span class="at">type=</span>L<span class="sc">$</span>estimator)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>      <span class="fu">return</span>(<span class="fu">list</span>(<span class="st">&quot;lambda_hat&quot;</span><span class="ot">=</span>lambda_hat))</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>    })</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">100</span>, <span class="at">n_cores=</span><span class="dv">20</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  },</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">main =</span> {</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  },</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">last =</span> {</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>    sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>()</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  },</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>  <span class="at">cluster_config =</span> <span class="fu">list</span>(<span class="at">js=</span><span class="st">&quot;slurm&quot;</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>)        </span></code></pre></div>
+<p>Note that none of the actual simulation code changed (with the
+exception of specifying <code>n_cores=20</code> in the
+<code>set_config()</code> call); we simply divided the code into chunks
+and and placed these chunks into the appropriate block
+(<code>first</code>, <code>main</code>, or <code>last</code>) within
+<code>run_on_cluster()</code>. Additionally, we specified which job
+scheduler to use in the <code>cluster_config</code> argument list. The
+command <code>js_support()</code> can be run in R to see a list of
+supported job scheduler software; the value in the <code>js_code</code>
+column is the value that should be specified in the
+<code>cluster_config</code> argument. Unsupported job schedulers can
+still be used for cluster parallelization, as detailed below.</p>
+<p>Next, we must give the job scheduler instructions on how to run the
+above code. In the following, we assume that the R code above is stored
+in a file called <code>my_simulation.R</code>. We also need to create a
+simple shell script called <code>run_sim.sh</code> with the following
+two lines, which will run <code>my_simulation.R</code> (we demonstrate
+this using BASH scripting language, but any shell scripting language may
+be used).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">Rscript</span> my_simulation.R</span></code></pre></div>
+<p>If created on a local machine, the two simulation files
+(<code>my_simulation.R</code> and <code>run_sim.sh</code>) must be
+transferred to the filesystem of the CCS. Finally, we use the job
+scheduler to submit three jobs. The first will run the
+<code>first</code> code, the second will run the <code>main</code> code,
+and the third will run the <code>last</code> code. With Slurm, we run
+the following three shell commands:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">sbatch</span> <span class="at">--export</span><span class="op">=</span>sim_run=<span class="st">&#39;first&#39;</span> run_sim.sh</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; Submitted batch job 101</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="ex">sbatch</span> <span class="at">--export</span><span class="op">=</span>sim_run=<span class="st">&#39;main&#39;</span> <span class="at">--array</span><span class="op">=</span>1-20 <span class="at">--depend</span><span class="op">=</span>afterok:101 run_sim.sh</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; Submitted batch job 102</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="ex">sbatch</span> <span class="at">--export</span><span class="op">=</span>sim_run=<span class="st">&#39;last&#39;</span> <span class="at">--depend</span><span class="op">=</span>afterok:102 run_sim.sh</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Submitted batch job 103</span></span></code></pre></div>
+<p>In the first line, we submit the <code>run_sim.sh</code> script using
+the <code>sim_run=&#39;first&#39;</code> environment variable, which tells
+<strong>SimEngine</strong> to only run the code in the
+<code>first</code> block. After running this, Slurm returns the message
+<code>Submitted batch job 101</code>. The number <code>101</code> is
+called the “job ID” and uniquely identifies the job on the CCS.</p>
+<p>In the second line, we submit the <code>run_sim.sh</code> script
+using the <code>sim_run=&#39;main&#39;</code> environment variable and tell
+Slurm to run a job array with “task IDs” 1-20. Each task corresponds to
+one core, and so in this case 20 cores will be used. This number should
+equal the <code>n_cores</code> number specified via
+<code>set_config()</code>. <strong>SimEngine</strong> handles the work
+of dividing the simulation replicates between the cores; the only
+restriction is that the number of cores cannot exceed the total number
+of simulation replicates.</p>
+<p>Also note that we included the option
+<code>--depend=afterok:101</code>, which instructs the job scheduler to
+wait until the first job finishes before starting the job array. (In
+practice, the number 101 must be replaced with whatever job ID Slurm
+assigned to the first job.) Once this command is submitted, the code in
+the <code>main</code> block will be run for each replicate. A temporary
+folder called <code>sim_results</code> will be created and filled with
+temporary objects containing data on the results and/or errors for each
+replicate.</p>
+<p>In the third line, we submit the <code>run_sim.sh</code> script using
+the <code>sim_run=&#39;last&#39;</code> environment variable. Again, we use
+<code>--depend=afterok:102</code> to ensure this code does not run until
+all tasks in the job array have finished. When this job runs,
+<strong>SimEngine</strong> will compile the results from the
+<code>main</code> block, run the code in the <code>last</code> block,
+save the simulation object to the filesystem, and delete the temporary
+<code>sim_results</code> folder and its contents. If desired, the user
+can leave the <code>last</code> block empty, but this third
+<code>sbatch</code> command should be run anyways to compile the results
+and save the simulation object for further analysis.</p>
+</div>
+<div id="additional-cluster-parallelization-functionality" class="section level2">
+<h2>Additional cluster parallelization functionality</h2>
+<div id="running-locally" class="section level3">
+<h3>Running locally</h3>
+<p>The <code>run_on_cluster()</code> function is programmed such that it
+can also be run locally. In this case, the code within the
+<code>first</code>, <code>main</code>, and <code>last</code> blocks will
+be executed in the calling environment of the
+<code>run_on_cluster()</code> function (typically the global
+environment); this can be useful for testing simulations locally before
+sending them to a CCS.</p>
+</div>
+<div id="using-unsupported-job-schedulers" class="section level3">
+<h3>Using unsupported job schedulers</h3>
+<p>There may be job schedulers that <strong>SimEngine</strong> does not
+natively support. If this is the case, <strong>SimEngine</strong> can
+still be used for cluster parallelization; this requires identifying the
+environment variable that the job scheduler uses to uniquely identify
+tasks within a job array. For example, Slurm uses the variable
+<code>&quot;SLURM_ARRAY_TASK_ID&quot;</code> and Grid Engine uses the variable
+<code>&quot;SGE_TASK_ID&quot;</code>. Once this variable is identified, it can be
+specified in the <code>cluster_config</code> block, as follows:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">run_on_cluster</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">first =</span> {...},</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">main =</span> {...},</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">last =</span> {...},</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">cluster_config =</span> <span class="fu">list</span>(<span class="at">tid_var=</span><span class="st">&quot;SLURM_ARRAY_TASK_ID&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="updating-a-simulation-on-a-ccs" class="section level3">
+<h3>Updating a simulation on a CCS</h3>
+<p>To update a simulation on a CCS, the
+<code>update_sim_on_cluster()</code> function can be used. The workflow
+is similar to that of <code>run_on_cluster()</code>, with several key
+differences. Instead of creating a new simulation object in the
+<code>first</code> block using <code>new_sim()</code>, the existing
+simulation object (which would have been saved to the filesystem when
+<code>run_on_cluster()</code> was called originally) is loaded using
+<code>readRDS()</code>. Then, the functions <code>set_levels()</code>
+and/or <code>set_config()</code> are called to specify the desired
+updates. In the <code>main</code> block, <code>update_sim()</code> is
+called (instead of <code>run()</code>). In the <code>last</code> block,
+code can remain the same or change as needed. These differences are
+illustrated in the code below.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">update_sim_on_cluster</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">first =</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    sim <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;sim.rds&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n=</span><span class="fu">c</span>(<span class="dv">100</span>,<span class="dv">500</span>,<span class="dv">1000</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  },</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">main =</span> {</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    sim <span class="sc">%&lt;&gt;%</span> <span class="fu">update_sim</span>()</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  },</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="at">last =</span> {</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>()</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  },</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="at">cluster_config =</span> <span class="fu">list</span>(<span class="at">js=</span><span class="st">&quot;slurm&quot;</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>)        </span></code></pre></div>
+<p>Submission of this code via a job scheduler proceeds in the same
+manner as described earlier for <code>run_on_cluster()</code>.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Advanced functionality</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Advanced functionality</h1>
+
+
+
+<div id="complex-simulation-levels" class="section level2">
+<h2>Complex simulation levels</h2>
+<p>Often, simulation levels will be simple, such as a vector of sample
+sizes:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n =</span> <span class="fu">c</span>(<span class="dv">200</span>,<span class="dv">400</span>,<span class="dv">800</span>))</span></code></pre></div>
+<p>However, there are many instances in which more complex objects are
+needed. For these cases, instead of a vector of numbers or character
+strings, a named list of lists can be used. The toy example below
+illustrates this.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">100</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">distribution =</span> <span class="fu">list</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="st">&quot;Beta 1&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="at">type=</span><span class="st">&quot;Beta&quot;</span>, <span class="at">params=</span><span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.7</span>)),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="st">&quot;Beta 2&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="at">type=</span><span class="st">&quot;Beta&quot;</span>, <span class="at">params=</span><span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">0.4</span>)),</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="st">&quot;Normal&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="at">type=</span><span class="st">&quot;Normal&quot;</span>, <span class="at">params=</span><span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  )</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n, type, params) {</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;Beta&quot;</span>) {</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">rbeta</span>(n, <span class="at">shape1=</span>params[<span class="dv">1</span>], <span class="at">shape2=</span>params[<span class="dv">2</span>]))</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;Normal&quot;</span>) {</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">rnorm</span>(n, <span class="at">mean=</span>params[<span class="dv">1</span>], <span class="at">sd=</span>params[<span class="dv">2</span>]))</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  }</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>}</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">create_data</span>(L<span class="sc">$</span>n, L<span class="sc">$</span>distribution<span class="sc">$</span>type, L<span class="sc">$</span>distribution<span class="sc">$</span>params)</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="st">&quot;y&quot;</span><span class="ot">=</span><span class="fu">mean</span>(x)))</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>})</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
+<p>Note that the list names (<code>&quot;Beta 1&quot;</code>,
+<code>&quot;Beta 2&quot;</code>, and <code>&quot;Normal&quot;</code>) become the entries in
+the <code>sim$results</code> dataframe, as well as the dataframe
+returned by <code>summarize()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;mean&quot;</span>, <span class="at">x=</span><span class="st">&quot;y&quot;</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt;   level_id   n distribution n_reps    mean_y</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; 1        1  10       Beta 1      1 0.3293261</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 2        2 100       Beta 1      1 0.2975617</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 3        3  10       Beta 2      1 0.8442316</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 4        4 100       Beta 2      1 0.7989588</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 5        5  10       Normal      1 2.9720820</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 6        6 100       Normal      1 2.9747477</span></span></code></pre></div>
+<p>Sometimes, it may be the case that you want to run simulations only
+for a subset of level combinations. In these cases, use the
+<code>.keep</code> option of <code>set_levels()</code> . First, set the
+levels normally. Second, view the <code>sim$levels_grid</code> dataframe
+to examine the level combinations and the associated
+<code>level_id</code> values. Third, call <code>set_levels()</code>
+again with the <code>.keep</code> option to specify which level
+combinations to keep. This is demonstrated below:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">alpha=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>), <span class="at">beta=</span><span class="fu">c</span>(<span class="dv">50</span>,<span class="dv">60</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">print</span>(sim<span class="sc">$</span>levels_grid)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;   level_id alpha beta</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; 1        1     2   50</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; 2        2     3   50</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; 3        3     4   50</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 4        4     2   60</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 5        5     3   60</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 6        6     4   60</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">.keep=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">6</span>))</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">print</span>(sim<span class="sc">$</span>levels_grid)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;   level_id alpha beta</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 1        1     2   50</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 2        2     3   50</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 6        6     4   60</span></span></code></pre></div>
+</div>
+<div id="complex-return-data" class="section level2">
+<h2>Complex return data</h2>
+<p>In most situations, the results of simulations are numeric. However,
+we may want to return more complex data, such as matrices, lists, or
+model objects. To do this, we add a key-value pair to the list returned
+by the simulation script with the special key <code>&quot;.complex&quot;</code>
+and a list (containing the complex data) as the value. This is
+illustrated in the toy example below. Here, the simulation script
+estimates the parameters of a linear regression and returns these as
+numeric, but also returns the estimated covariance matrix and the entire
+model object.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n=</span><span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>x <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="st">&quot;x&quot;</span><span class="ot">=</span>x, <span class="st">&quot;y&quot;</span><span class="ot">=</span>y))</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>}</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">2</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(L<span class="sc">$</span>n)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">lm</span>(y<span class="sc">~</span>x, <span class="at">data=</span>dat)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>    <span class="st">&quot;beta0_hat&quot;</span> <span class="ot">=</span> model<span class="sc">$</span>coefficients[[<span class="dv">1</span>]],</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    <span class="st">&quot;beta1_hat&quot;</span> <span class="ot">=</span> model<span class="sc">$</span>coefficients[[<span class="dv">2</span>]],</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    <span class="st">&quot;.complex&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>      <span class="st">&quot;model&quot;</span> <span class="ot">=</span> model,</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>      <span class="st">&quot;cov_mtx&quot;</span> <span class="ot">=</span> <span class="fu">vcov</span>(model)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    )</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>  ))</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>})</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
+<p>After running this simulation, the numeric results can be accessed
+directly via <code>sim$results</code> or using the
+<code>summarize()</code> function, as usual:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">head</span>(sim<span class="sc">$</span>results)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id    n      runtime beta0_hat  beta1_hat</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; 1       1        1      1   10 0.0023009777  3.313459 1.64224090</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; 2       4        1      2   10 0.0006840229  3.682214 0.04035482</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; 3       2        2      1  100 0.0026309490  3.083269 2.08769380</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; 4       5        2      2  100 0.0006608963  2.781492 2.11971793</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; 5       3        3      1 1000 0.0009598732  3.105255 1.86686623</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; 6       6        3      2 1000 0.0008368492  2.964213 2.09937006</span></span></code></pre></div>
+<p>To examine the complex return data, we can use the function
+<code>get_complex()</code>, as illustrated below:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>c5 <span class="ot">&lt;-</span> <span class="fu">get_complex</span>(sim, <span class="at">sim_uid=</span><span class="dv">5</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(c5<span class="sc">$</span>model))</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ x, data = dat)</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; -2.71501 -0.57515 -0.07813  0.74569  2.87825 </span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; (Intercept)   2.7815     0.1926  14.442  &lt; 2e-16 ***</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; x             2.1197     0.3234   6.554 2.63e-09 ***</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 0.9914 on 98 degrees of freedom</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.3047, Adjusted R-squared:  0.2976 </span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; F-statistic: 42.95 on 1 and 98 DF,  p-value: 2.628e-09</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="fu">print</span>(c5<span class="sc">$</span>cov_mtx)</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;             (Intercept)           x</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; (Intercept)  0.03709408 -0.05340809</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; x           -0.05340809  0.10461387</span></span></code></pre></div>
+</div>
+<div id="using-the-batch-function" class="section level2">
+<h2>Using the <code>batch</code> function</h2>
+<p>The <code>batch()</code> function is useful for sharing data or
+objects between simulation replicates. Essentially, it allows simulation
+replicates to be divided into “batches”; all replicates in a given batch
+will then share a certain set of objects. A common use case for this is
+a simulation that involves using multiple methods to analyze a shared
+dataset, and repeating this process over a number of dataset replicates.
+This may be of interest if, for example, it is computationally expensive
+to generate a simulated dataset.</p>
+<p>To illustrate the use of <code>batch()</code> using this example, we
+first consider the following simulation:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) { <span class="fu">rnorm</span>(<span class="at">n=</span>n, <span class="at">mean=</span><span class="dv">3</span>) }</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>est_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, type) {</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_mean&quot;</span>) { <span class="fu">return</span>(<span class="fu">mean</span>(dat)) }</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_median&quot;</span>) { <span class="fu">return</span>(<span class="fu">median</span>(dat)) }</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>}</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">est=</span><span class="fu">c</span>(<span class="st">&quot;est_mean&quot;</span>,<span class="st">&quot;est_median&quot;</span>))</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">3</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(<span class="at">n=</span><span class="dv">100</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  mu_hat <span class="ot">&lt;-</span> <span class="fu">est_mean</span>(<span class="at">dat=</span>dat, <span class="at">type=</span>L<span class="sc">$</span>est)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    <span class="st">&quot;mu_hat&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(mu_hat,<span class="dv">2</span>),</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="st">&quot;dat_1&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(dat[<span class="dv">1</span>],<span class="dv">2</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  ))</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>})</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
+<p>From the <code>&quot;dat_1&quot;</code> column of the results object (equal to
+the first element of the <code>dat</code> vector created in the
+simulation script), we see that a unique dataset was created for each
+simulation replicate:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>sim<span class="sc">$</span>results[<span class="fu">order</span>(sim<span class="sc">$</span>results<span class="sc">$</span>rep_id),<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>)<span class="sc">!=</span><span class="dv">5</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id        est mu_hat dat_1</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; 1       1        1      1   est_mean   3.17  3.75</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; 4       2        2      1 est_median   3.13  2.50</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; 2       3        1      2   est_mean   3.06  4.36</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; 5       5        2      2 est_median   2.88  2.31</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; 3       4        1      3   est_mean   3.00  2.27</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; 6       6        2      3 est_median   2.97  2.63</span></span></code></pre></div>
+<p>Suppose that instead, we wish to analyze each simulated dataset using
+multiple methods (in this case corresponding to <code>&quot;est_mean&quot;</code>
+and <code>&quot;est_median&quot;</code>), and repeat this procedure a total of
+three times. We can do this using the <code>batch()</code> function, as
+follows:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) { <span class="fu">rnorm</span>(<span class="at">n=</span>n, <span class="at">mean=</span><span class="dv">3</span>) }</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>est_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, type) {</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_mean&quot;</span>) { <span class="fu">return</span>(<span class="fu">mean</span>(dat)) }</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_median&quot;</span>) { <span class="fu">return</span>(<span class="fu">median</span>(dat)) }</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>}</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">est=</span><span class="fu">c</span>(<span class="st">&quot;est_mean&quot;</span>,<span class="st">&quot;est_median&quot;</span>))</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">3</span>, <span class="at">batch_levels=</span><span class="cn">NULL</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  <span class="fu">batch</span>({</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(<span class="at">n=</span><span class="dv">100</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  })</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  mu_hat <span class="ot">&lt;-</span> <span class="fu">est_mean</span>(<span class="at">dat=</span>dat, <span class="at">type=</span>L<span class="sc">$</span>est)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>    <span class="st">&quot;mu_hat&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(mu_hat,<span class="dv">2</span>),</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>    <span class="st">&quot;dat_1&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(dat[<span class="dv">1</span>],<span class="dv">2</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  ))</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>})</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span></code></pre></div>
+<p>In the code above, we changed two things. First, we added
+<code>batch_levels=NULL</code> to the <code>set_config()</code> call;
+this will be explained below. Second, we wrapped the code line
+<code>dat &lt;- create_data(n=100)</code> inside the
+<code>batch()</code> function. Whatever code goes inside the
+<code>batch()</code> function will produce the same output for all
+simulations in a batch.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>sim<span class="sc">$</span>results[<span class="fu">order</span>(sim<span class="sc">$</span>results<span class="sc">$</span>rep_id),<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>)<span class="sc">!=</span><span class="dv">5</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id        est mu_hat dat_1</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; 1       1        1      1   est_mean   3.05  3.99</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; 4       2        2      1 est_median   2.98  3.99</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; 2       3        1      2   est_mean   3.09  1.72</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; 5       5        2      2 est_median   3.14  1.72</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; 3       4        1      3   est_mean   2.98  2.66</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; 6       6        2      3 est_median   2.90  2.66</span></span></code></pre></div>
+<p>In this case, from the <code>&quot;dat_1&quot;</code> column of the results
+object, we see that one dataset was created and shared by the batch
+corresponding to <code>sim_uids</code> 1 and 2 (likewise for
+<code>sim_uids</code> {3,5} and {4,6}).</p>
+<p>However, the situation is often more complicated. Suppose we have a
+simulation with multiple levels, some that correspond to creating data
+and some that correspond to analyzing the data. Here, the
+<code>batch_levels</code> argument of <code>set_config()</code> plays a
+role. Specifically, this argument should be a character vector equal to
+the names of the simulation levels that are referenced (via the special
+variable <code>L</code>) from within a <code>batch()</code> block. In
+the example below, the levels <code>n</code> and <code>mu</code> are
+used within the <code>batch()</code> call, while the level
+<code>est</code> is not.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n, mu) { <span class="fu">rnorm</span>(<span class="at">n=</span>n, <span class="at">mean=</span>mu) }</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>est_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, type) {</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_mean&quot;</span>) { <span class="fu">return</span>(<span class="fu">mean</span>(dat)) }</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="cf">if</span> (type<span class="sc">==</span><span class="st">&quot;est_median&quot;</span>) { <span class="fu">return</span>(<span class="fu">median</span>(dat)) }</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>}</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">100</span>), <span class="at">mu=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>), <span class="at">est=</span><span class="fu">c</span>(<span class="st">&quot;est_mean&quot;</span>,<span class="st">&quot;est_median&quot;</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">2</span>, <span class="at">batch_levels=</span><span class="fu">c</span>(<span class="st">&quot;n&quot;</span>, <span class="st">&quot;mu&quot;</span>), <span class="at">return_batch_id=</span>T)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="fu">batch</span>({</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(<span class="at">n=</span>L<span class="sc">$</span>n, <span class="at">mu=</span>L<span class="sc">$</span>mu)</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  })</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  mu_hat <span class="ot">&lt;-</span> <span class="fu">est_mean</span>(<span class="at">dat=</span>dat, <span class="at">type=</span>L<span class="sc">$</span>est)</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>    <span class="st">&quot;mu_hat&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(mu_hat,<span class="dv">2</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>    <span class="st">&quot;dat_1&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(dat[<span class="dv">1</span>],<span class="dv">2</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>  ))</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>})</span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>sim<span class="sc">$</span>results[<span class="fu">order</span>(sim<span class="sc">$</span>results<span class="sc">$</span>batch_id),<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">!=</span><span class="dv">8</span>]</span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt;    sim_uid level_id rep_id batch_id   n mu        est mu_hat dat_1</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; 1        1        1      1        1  10  3   est_mean   3.11  4.88</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; 9        5        5      1        1  10  3 est_median   2.93  4.88</span></span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="co">#&gt; 2        9        1      2        2  10  3   est_mean   2.79  1.65</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; 10      13        5      2        2  10  3 est_median   2.35  1.65</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="co">#&gt; 3        2        2      1        3 100  3   est_mean   3.02  3.83</span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="co">#&gt; 11       6        6      1        3 100  3 est_median   3.00  3.83</span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="co">#&gt; 4       10        2      2        4 100  3   est_mean   3.10  2.81</span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="co">#&gt; 12      14        6      2        4 100  3 est_median   3.06  2.81</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="co">#&gt; 5        3        3      1        5  10  5   est_mean   4.98  5.83</span></span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a><span class="co">#&gt; 13       7        7      1        5  10  5 est_median   5.03  5.83</span></span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a><span class="co">#&gt; 6       11        3      2        6  10  5   est_mean   5.36  7.78</span></span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a><span class="co">#&gt; 14      15        7      2        6  10  5 est_median   5.41  7.78</span></span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a><span class="co">#&gt; 7        4        4      1        7 100  5   est_mean   5.08  4.56</span></span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="co">#&gt; 15       8        8      1        7 100  5 est_median   4.99  4.56</span></span>
+<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a><span class="co">#&gt; 8       12        4      2        8 100  5   est_mean   5.30  5.69</span></span>
+<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a><span class="co">#&gt; 16      16        8      2        8 100  5 est_median   5.26  5.69</span></span></code></pre></div>
+<p>The batches were created such that each batch contained two
+replicates, one for each level value of <code>est</code>. For expository
+purposes, we also specified the <code>return_batch_id=T</code> option in
+<code>set_config()</code> so that the results object would return the
+<code>batch_id</code>. This is not necessary in practice. The
+<code>batch_id</code> variable defines the batches; all simulations that
+share the same <code>batch_id</code> are in a single batch. The
+<code>return_batch_id=T</code> option can be useful to ensure correct
+usage of the <code>batch()</code> function.</p>
+<p>We note the following about the <code>batch()</code> function:</p>
+<ul>
+<li>The code within the <code>batch()</code> code block must
+<em>only</em> create objects; this code should not change or delete
+existing objects, as these changes will be ignored.</li>
+<li>In the majority of cases, the <code>batch()</code> function will be
+called just once, at the beginning of the simulation script. However, it
+can be used anywhere in the script and can be called multiple times. The
+<code>batch()</code> function should never be used outside of the
+simulation script.</li>
+<li>Although we have illustrated the use of the <code>batch()</code>
+function to create a dataset to share between multiple simulation
+replicates, it can be used for much more, such as taking a sample from
+an existing dataset or computing shared nuisance function
+estimators.</li>
+<li>If the simulation is being run in parallel (either locally or on a
+CCS), <code>n_cores</code> cannot exceed the number of batches, since
+all simulations within a batch must run on the same core.</li>
+<li>If the simulation script uses the <code>batch()</code> function, the
+simulation cannot be updated using the <code>update_sim()</code> or
+<code>update_sim_on_cluster()</code> functions, with the exception of
+updates that only entail removing simulation replicates.</li>
+</ul>
+</div>
+<div id="random-number-generator-seeds" class="section level2">
+<h2>Random number generator seeds</h2>
+<p>In statistical research, it is desirable to be able to reproduce the
+exact results of a simulation study. Since R code often involves
+stochastic (random) functions like <code>rnorm()</code> or
+<code>sample()</code> that return different values when called multiple
+times, reproducibility is not guaranteed. In a simple R script, calling
+the <code>set.seed()</code> function at the beginning of the script
+ensures that the stochastic functions that follow will produce the same
+results whenever the script is run. However, a more nuanced strategy is
+needed when running simulations. When running 100 replicates of the same
+simulation, we do not want each replicate to return identical results;
+rather, we would like for each replicate to be different from one
+another, but for <em>the entire set of replicates</em> to be the same
+when the entire simulation is run twice in a row.
+<strong>SimEngine</strong> manages this process, even when simulations
+are being run in parallel locally or on a cluster computing system. In
+<strong>SimEngine</strong>, a single “global seed” is used to generate a
+different seed for each simulation replicate. The
+<code>set_config()</code> function is used to set or change this global
+seed:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">seed=</span><span class="dv">123</span>)</span></code></pre></div>
+<p>If a seed is not set using <code>set_config()</code>,
+<strong>SimEngine</strong> will set a random seed automatically so that
+the results can be replicated if desired. To view this seed, we use the
+<code>vars()</code> function:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">vars</span>(sim, <span class="st">&quot;seed&quot;</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; &lt;list_of&lt;quosure&gt;&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; &lt;quosure&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; expr: ^sim</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; env:  global</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; &lt;quosure&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt; expr: ^&quot;seed&quot;</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt; env:  empty</span></span></code></pre></div>
+</div>
+<div id="debugging-and-errorwarning-handling" class="section level2">
+<h2>Debugging and error/warning handling</h2>
+<p>In the simulation coding workflow, errors are inevitable. Some errors
+may affect all simulation replicates, while other errors may only affect
+a subset of replicates. By default, when a simulation is run,
+<strong>SimEngine</strong> will not stop if an error occurs; instead,
+errors are logged and stored in a dataframe along with information about
+the simulation replicates that resulted in those errors. Examining this
+dataframe by typing <code>print(sim$errors)</code> can sometimes help to
+quickly pinpoint the issue. This is demonstrated below:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">2</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="at">Sigma =</span> <span class="fu">list</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>    <span class="at">s1 =</span> <span class="fu">list</span>(<span class="at">mtx=</span><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">nrow=</span><span class="dv">2</span>)),</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>    <span class="at">s3 =</span> <span class="fu">list</span>(<span class="at">mtx=</span><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">9</span>), <span class="at">nrow=</span><span class="dv">2</span>)),</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>    <span class="at">s2 =</span> <span class="fu">list</span>(<span class="at">mtx=</span><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">nrow=</span><span class="dv">2</span>)),</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    <span class="at">s4 =</span> <span class="fu">list</span>(<span class="at">mtx=</span><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>), <span class="at">nrow=</span><span class="dv">2</span>))</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  )</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>)</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>  x <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">mvrnorm</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">mu=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">Sigma=</span>L<span class="sc">$</span>Sigma<span class="sc">$</span>mtx)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">x1=</span>x[<span class="dv">1</span>], <span class="at">x2=</span>x[<span class="dv">2</span>]))</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>})</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; Done. Errors detected in 25% of simulation replicates. Warnings detected in 0% of simulation replicates.</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="fu">print</span>(sim<span class="sc">$</span>errors)</span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt;   sim_uid level_id rep_id Sigma      runtime                          message</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co">#&gt; 1       5        3      1    s2 0.0002849102 &#39;Sigma&#39; is not positive definite</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="co">#&gt; 2       6        3      2    s2 0.0002381802 &#39;Sigma&#39; is not positive definite</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt;                                                      call</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt; 1 MASS::mvrnorm(n = 1, mu = c(0, 0), Sigma = L$Sigma$mtx)</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt; 2 MASS::mvrnorm(n = 1, mu = c(0, 0), Sigma = L$Sigma$mtx)</span></span></code></pre></div>
+<p>From the output above, we see that the code fails for the simulation
+replicates that use the level with <code>Sigma=&quot;s2&quot;</code> because it
+uses an invalid (not positive definite) covariance matrix. Similarly, if
+a simulation involves replicates that throw warnings, all warnings are
+logged and stored in the dataframe <code>sim$warnings</code>.</p>
+<p>The workflow demonstrated above can be useful to pinpoint errors, but
+it has two main drawbacks. First, it is undesirable to run a
+time-consuming simulation involving hundreds or thousands of replicates,
+only to find at the end that every replicate failed because of a typo.
+It may therefore useful to stop an entire simulation after a single
+error has occurred. Second, it can sometimes be difficult to determine
+exactly what caused an error without making use of more advanced
+debugging tools. For both of these situations,
+<strong>SimEngine</strong> includes the following configuration
+option:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">stop_at_error=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Setting <code>stop_at_error=TRUE</code> will stop the simulation when
+it encounters any error. Furthermore, the error will be thrown by R in
+the usual way, so if the simulation is being run in in RStudio, the
+built-in debugging tools (such as “Show Traceback” and “Rerun with
+debug”) can be used to find and fix the bug. Placing a call to
+<code>browser()</code> at the top of the simulation script can also be
+useful for debugging.</p>
+</div>
+<div id="monte-carlo-error" class="section level2">
+<h2>Monte Carlo error</h2>
+<p>Statistical simulations are often based on the principle of Monte
+Carlo approximation; specifically, pseudo-random sampling is used to
+evaluate the performance of a statistical procedure under a particular
+data-generating process. The performance of the procedure can be viewed
+as a statistical parameter and, due to the fact that only a finite
+number of simulation replicates can be performed, there is uncertainty
+in any estimate of performance. This uncertainty is often referred to as
+<em>Monte Carlo error</em>. We can quantify Monte Carlo error using, for
+example, the standard error of the performance estimator.</p>
+<p>Measuring and reporting Monte Carlo error is a vital component of a
+simulation study. <strong>SimEngine</strong> includes an option in the
+<code>summarize()</code> function to automatically estimate the Monte
+Carlo standard error for any inferential summary statistic, e.g.,
+estimator bias or confidence interval coverage. The standard error
+estimates are based on the formulas provided in Morris et al. 2019. If
+the option <code>mc_se</code> is set to <code>TRUE</code>, estimates of
+Monte Carlo standard error will be included in the summary data frame,
+along with associated 95% confidence intervals based on a normal
+approximation.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">new_sim</span>()</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>create_data <span class="ot">&lt;-</span> <span class="cf">function</span>(n) { <span class="fu">rpois</span>(n, <span class="at">lambda=</span><span class="dv">5</span>) }</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>est_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(dat) {</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">mean</span>(dat))</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>}</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_levels</span>(<span class="at">n=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">100</span>,<span class="dv">1000</span>))</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_config</span>(<span class="at">num_sim=</span><span class="dv">5</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">set_script</span>(<span class="cf">function</span>() {</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">create_data</span>(L<span class="sc">$</span>n)</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>  lambda_hat <span class="ot">&lt;-</span> <span class="fu">est_mean</span>(<span class="at">dat=</span>dat)</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>  <span class="fu">return</span> (<span class="fu">list</span>(<span class="st">&quot;lambda_hat&quot;</span><span class="ot">=</span>lambda_hat))</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>})</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>sim <span class="sc">%&lt;&gt;%</span> <span class="fu">run</span>()</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt; Done. No errors or warnings detected.</span></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>sim <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(</span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">stat=</span><span class="st">&quot;mse&quot;</span>, <span class="at">name=</span><span class="st">&quot;lambda_mse&quot;</span>, <span class="at">estimate=</span><span class="st">&quot;lambda_hat&quot;</span>, <span class="at">truth=</span><span class="dv">5</span>), </span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>  <span class="at">mc_se =</span> <span class="cn">TRUE</span></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a>)</span>
+<span id="cb17-19"><a href="#cb17-19" tabindex="-1"></a><span class="co">#&gt;   level_id    n n_reps lambda_mse lambda_mse_mc_se lambda_mse_mc_ci_l</span></span>
+<span id="cb17-20"><a href="#cb17-20" tabindex="-1"></a><span class="co">#&gt; 1        1   10      5   0.602000     0.4280700877       -0.237017372</span></span>
+<span id="cb17-21"><a href="#cb17-21" tabindex="-1"></a><span class="co">#&gt; 2        2  100      5   0.052200     0.0234607545        0.006216921</span></span>
+<span id="cb17-22"><a href="#cb17-22" tabindex="-1"></a><span class="co">#&gt; 3        3 1000      5   0.002099     0.0005030319        0.001113057</span></span>
+<span id="cb17-23"><a href="#cb17-23" tabindex="-1"></a><span class="co">#&gt;   lambda_mse_mc_ci_u</span></span>
+<span id="cb17-24"><a href="#cb17-24" tabindex="-1"></a><span class="co">#&gt; 1        1.441017372</span></span>
+<span id="cb17-25"><a href="#cb17-25" tabindex="-1"></a><span class="co">#&gt; 2        0.098183079</span></span>
+<span id="cb17-26"><a href="#cb17-26" tabindex="-1"></a><span class="co">#&gt; 3        0.003084943</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

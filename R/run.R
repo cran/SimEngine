@@ -11,8 +11,6 @@
 #'     errors are stored in \code{sim$errors}, and warnings are stored in
 #'     \code{sim$warnings}.
 #' @examples
-#' # The following is a toy example of a simulation, illustrating the use of
-#' # the run function.
 #' sim <- new_sim()
 #' create_data <- function(n) { rpois(n, lambda=5) }
 #' est_mean <- function(dat, type) {
@@ -203,6 +201,14 @@ run.sim_obj <- function(sim) {
 
   # Combine lists
   results_lists <- unlist(results_lists, recursive=F)
+
+  # Error handling
+  r_names <- names(results_lists[[1]]$results)
+  if (any(r_names %in% disallowed_names())) {
+    index <- min(which(r_names %in% disallowed_names()))
+    stop(paste0("Your simulation script cannot return a key-value pair with th",
+                "e key `", r_names[index], "`."))
+  }
 
   # Stop cluster
   if (exists("..cl")) { parallel::stopCluster(..cl) }

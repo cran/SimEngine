@@ -18,16 +18,21 @@ A modular framework for statistical simulations in R
 
 ## Installation
 
-The latest stable version of **SimEngine** can be installed from CRAN using `install.packages()`. The current development version can be installed using `devtools::install_github()`:
+The latest stable version of **SimEngine** can be installed from CRAN using `install.packages()`:
 
 ```R
 install.packages("SimEngine")
+```
+
+The current development version can be installed using `devtools::install_github()`:
+
+```R
 devtools::install_github(repo="Avi-Kenny/SimEngine")
 ```
 
 ## Documentation
 
-The full package documentation can be found at [https://avi-kenny.github.io/SimEngine/](https://avi-kenny.github.io/SimEngine/). All of the CRAN documentation (i.e. the function reference and vignettes) can also be found here.
+The full package documentation can be found at [https://avi-kenny.github.io/SimEngine/](https://avi-kenny.github.io/SimEngine/).
 
 ## Bugs reports and feature requests
 

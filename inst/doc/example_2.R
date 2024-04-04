@@ -1,11 +1,8 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
-## ----setup, message = FALSE---------------------------------------------------
-library(tidyr)
 library(SimEngine)
 
 ## -----------------------------------------------------------------------------
@@ -19,7 +16,7 @@ create_regression_data <- function(n) {
   return(data.frame(x=x, y=y))
 }
 
-## ---- message = FALSE, fig.width = 6------------------------------------------
+## ----message = FALSE, fig.width = 6-------------------------------------------
 dat <- create_regression_data(n=500)
 linear_model <- lm(y~x, data=dat)
 dat$residuals <- linear_model$residuals
@@ -79,6 +76,7 @@ summarized_results <- sim %>% summarize(
 print(summarized_results)
 
 ## -----------------------------------------------------------------------------
+library(tidyr)
 plot_results <- function(which_graph, n_est) {
   if (n_est == 3) {
     values <- c("#999999", "#E69F00", "#56B4E9")
@@ -141,7 +139,7 @@ plot_results <- function(which_graph, n_est) {
   }
 }
 
-## ---- message = FALSE, fig.width = 6------------------------------------------
+## ----message = FALSE, fig.width = 6-------------------------------------------
 plot_results("width", 2)
 plot_results("coverage", 2)
 
@@ -175,7 +173,7 @@ sim %<>% set_config(
 
 sim %<>% update_sim()
 
-## ---- fig.width = 6-----------------------------------------------------------
+## ----fig.width = 6------------------------------------------------------------
 summarized_results <- sim %>% summarize(
   list(stat="mean", name="mean_se_beta0", x="beta0_se_est"),
   list(stat="mean", name="mean_se_beta1", x="beta1_se_est"),

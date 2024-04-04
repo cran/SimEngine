@@ -1,16 +1,16 @@
 #' Create a new simulation object
 #'
 #' @description Create a new simulation object. This is typically the first
-#'     function to be called when running a simulation using \pkg{SimEngine}. Most
-#'     other \pkg{SimEngine} functions take a simulation object as their first
-#'     argument.
+#'     function to be called when running a simulation using \pkg{SimEngine}.
+#'     Most other \pkg{SimEngine} functions take a simulation object as their
+#'     first argument.
 #' @return A simulation object, of class \code{sim_obj}
 #' @seealso
 #' Visit \url{https://avi-kenny.github.io/SimEngine/} for more information on how to
 #'     use the \pkg{SimEngine} simulation framework.
 #' @examples
 #' sim <- new_sim()
-#' sim
+#' print(sim)
 #' @export
 new_sim <- function() {
 
@@ -167,6 +167,9 @@ new_sim <- function() {
   # Simulation objects have the class "sim_obj"
   class(..sim) <- "sim_obj"
   rm(..e, ..seed)
+
+  # Prevent R CMD CHECK note
+  if (F) { MASS::mvrnorm() }
 
   return (..sim)
 
